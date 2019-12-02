@@ -1,0 +1,37 @@
+Package: mscleanr
+Type: Package
+Title: Cleans MS Data for Easier Analyses
+Version: 0.1.0
+Authors@R: c(
+    person("Ophélie", "Fraisier-Vannier", email = "ophelie.fraisier-vannier@univ-tlse3.fr", role = "aut"),
+    person("Guillaume", "Marty", email = "guillaume.marty@univ-tlse3.fr", role = "cre"),
+    person("Guillaume", "Cabanac", email = "guillaume.cabanac@univ-tlse3.fr", role = "aut"))
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 2.10)
+Imports:
+    magrittr,
+    rlang,
+    crayon,
+    splitstackshape,
+    stringr,
+    reshape2,
+    MScombine,
+    data.table,
+    lazyeval,
+    igraph,
+    dplyr,
+    Hmisc,
+    gtools,
+    speaq,
+    fuzzyjoin
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 2.1.0)
+VignetteBuilder: knitr
+RoxygenNote: 6.1.1
