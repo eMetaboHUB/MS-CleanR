@@ -4,8 +4,13 @@
 \alias{detect_single_polarity_combinations}
 \title{Detect possible adducts and neutral losses.}
 \usage{
-detect_single_polarity_combinations(peaks_data, threshold_rt, threshold_mz,
-  mass_neutral_loss, mass_isotopes)
+detect_single_polarity_combinations(
+  peaks_data,
+  threshold_rt,
+  threshold_mz,
+  mass_neutral_loss,
+  mass_isotopes
+)
 }
 \arguments{
 \item{peaks_data}{A data.frame containing peaks to treat, coming from MSDial.}

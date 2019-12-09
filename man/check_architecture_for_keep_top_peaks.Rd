@@ -4,8 +4,11 @@
 \alias{check_architecture_for_keep_top_peaks}
 \title{Check project architecture before running \code{\link{keep_top_peaks}}.}
 \usage{
-check_architecture_for_keep_top_peaks(project_directory,
-  export_filtered_peaks, overwrite = FALSE)
+check_architecture_for_keep_top_peaks(
+  project_directory,
+  export_filtered_peaks,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

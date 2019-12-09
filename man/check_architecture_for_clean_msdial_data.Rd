@@ -4,8 +4,7 @@
 \alias{check_architecture_for_clean_msdial_data}
 \title{Check project architecture before running \code{\link{clean_msdial_data}}.}
 \usage{
-check_architecture_for_clean_msdial_data(project_directory,
-  overwrite = FALSE)
+check_architecture_for_clean_msdial_data(project_directory, overwrite = FALSE)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

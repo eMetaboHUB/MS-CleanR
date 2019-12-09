@@ -4,8 +4,13 @@
 \alias{clean_for_current_run}
 \title{Create a directory or delete a file for a new run.}
 \usage{
-clean_for_current_run(project_directory, filetype, overwrite = FALSE,
-  create_dir = FALSE, ...)
+clean_for_current_run(
+  project_directory,
+  filetype,
+  overwrite = FALSE,
+  create_dir = FALSE,
+  ...
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

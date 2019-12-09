@@ -40,4 +40,6 @@ launch_msfinder_annotation(project_directory,
                            biosoc_levels = c("genre", "family"),
                            levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
                            overwrite = TRUE)
+                           
+convert_csv_to_msp(project_directory, min_score = 20)
 ```

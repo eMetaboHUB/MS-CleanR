@@ -8,7 +8,6 @@
 annotate_cluster <- function(identifying_data, cluster_id, couple_ids = NULL, compound_levels = NULL, biosoc_levels = NULL) {
     print_message("Annotating cluster ", cluster_id)
     in_cluster <- identifying_data$cluster == cluster_id
-
     possibilities <- identifying_data[in_cluster
                                       & !is.na(identifying_data$level)
                                       & !is.nan(identifying_data$Total.score),]
@@ -31,7 +30,12 @@ annotate_cluster <- function(identifying_data, cluster_id, couple_ids = NULL, co
             identifying_data[identifying_data$id %in% couple_ids & identifying_data$Average.Mz == max.mz,]$annotation <- TRUE
         }
     } else {
-        common_ids <- merge(mode_1, mode_2, by = c("level", "Formula", "Structure", "SMILES", "Compound_level"))
+        if ("Compound_level" %in% names(mode_1)) {
+            col_merge <- c("level", "Formula", "Structure", "SMILES", "Compound_level")
+        } else {
+            col_merge <- c("level", "Formula", "Structure", "SMILES")
+        }
+        common_ids <- merge(mode_1, mode_2, by = col_merge)
         if (nrow(common_ids) > 0) {
             # ID identique dans 2 modes
             id_type <- "Double ID"
@@ -88,7 +92,7 @@ find_structure <- function(possibilities, compound_levels = NULL, biosoc_levels 
 #' @return A vector containing the row id(s) of the most probable structure(s).
 get_most_probable <- function(possibilities) {
     # ID simple ou double
-    simple_id <- if (length(grep("Total.score", names(possibilities))) > 1) FALSE else TRUE
+    simple_id <- length(grep("Total.score", names(possibilities))) == 1
 
     # Max score then min rank
     if(simple_id) {
@@ -101,13 +105,15 @@ get_most_probable <- function(possibilities) {
     possibilities <- possibilities[possibilities$sort_score == max(possibilities$sort_score, na.rm=TRUE),]
     possibilities <- possibilities[possibilities$sort_rank  == min(possibilities$sort_rank, na.rm=TRUE),]
 
-    if (simple_id) return(c(possibilities$rowid))
+    if (simple_id) final <- c(possibilities$rowid)
     else {
         # get rowid max score for each couple
-        possibilities$max.rowid <- if(possibilities$Total.score.x > possibilities$Total.score.y) possibilities$rowid.x
-                                   else                                                          possibilities$rowid.y
-        return(levels(factor(possibilities$max.rowid)))
+        possibilities$max.rowid <- ifelse(possibilities$Total.score.x > possibilities$Total.score.y,
+                                          possibilities$rowid.x,
+                                          possibilities$rowid.y)
+        final <- levels(factor(possibilities$max.rowid))
     }
+    return(final)
 }
 
 

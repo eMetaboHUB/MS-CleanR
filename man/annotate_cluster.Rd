@@ -4,8 +4,13 @@
 \alias{annotate_cluster}
 \title{Annotate a single cluster}
 \usage{
-annotate_cluster(identifying_data, cluster_id, couple_ids = NULL,
-  compound_levels = NULL, biosoc_levels = NULL)
+annotate_cluster(
+  identifying_data,
+  cluster_id,
+  couple_ids = NULL,
+  compound_levels = NULL,
+  biosoc_levels = NULL
+)
 }
 \arguments{
 \item{identifying_data}{A data.frame containing possible identifications.}

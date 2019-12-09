@@ -4,8 +4,14 @@
 \alias{get_project_file_path}
 \title{Get path for a project file or directory.}
 \usage{
-get_project_file_path(project_directory, filetype, source = NA,
-  msfinder_info = NA, msfinder_lvl = NA, peak_id = NA)
+get_project_file_path(
+  project_directory,
+  filetype,
+  source = NA,
+  msfinder_info = NA,
+  msfinder_lvl = NA,
+  peak_id = NA
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

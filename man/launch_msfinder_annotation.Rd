@@ -4,8 +4,13 @@
 \alias{launch_msfinder_annotation}
 \title{Annotates peaks based on files extracted from MSFinder.}
 \usage{
-launch_msfinder_annotation(project_directory, compound_levels = NULL,
-  biosoc_levels = NULL, levels_scores = NULL, overwrite = FALSE)
+launch_msfinder_annotation(
+  project_directory,
+  compound_levels = NULL,
+  biosoc_levels = c("generic"),
+  levels_scores = NULL,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

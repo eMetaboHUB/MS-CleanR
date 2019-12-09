@@ -3,15 +3,14 @@
 \docType{package}
 \name{mscleanr}
 \alias{mscleanr}
-\alias{mscleanr-package}
 \title{mscleanr: A package for cleaning and analyzing MS data}
 \description{
-The mscleanr package provides 2 important functions: clean_msdial_data and launch_msfinder_annotation.
+The mscleanr package provides 2 important functions: \code{\link{clean_msdial_data}}, \code{\link{keep_top_peaks}} and \code{\link{launch_msfinder_annotation}}.
 See the functions documentation and vignettes for more information.
 Needs MSDial v4.00 or higher.
 }
 \section{Architecture needed for an analysis}{
 
-See \code{\link{clean_msdial_data}} and \code{\link{launch_msfinder_annotation}} documentation.
+See functions documentation.
 }
 

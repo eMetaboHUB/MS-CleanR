@@ -4,8 +4,13 @@
 \alias{keep_top_peaks}
 \title{Filter peaks based on a given criterion.}
 \usage{
-keep_top_peaks(project_directory, selection_criterion, n = 1,
-  export_filtered_peaks = TRUE, overwrite = FALSE)
+keep_top_peaks(
+  project_directory,
+  selection_criterion,
+  n = 1,
+  export_filtered_peaks = TRUE,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

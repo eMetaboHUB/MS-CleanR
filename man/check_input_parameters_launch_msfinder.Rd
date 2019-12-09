@@ -4,8 +4,12 @@
 \alias{check_input_parameters_launch_msfinder}
 \title{Check if input parameters are correct before running \code{launch_msfinder_annotation}.}
 \usage{
-check_input_parameters_launch_msfinder(msfinder_biosoc_levels,
-  msfinder_compound_levels, levels_scores, overwrite)
+check_input_parameters_launch_msfinder(
+  msfinder_biosoc_levels,
+  msfinder_compound_levels,
+  levels_scores,
+  overwrite
+)
 }
 \arguments{
 \item{msfinder_biosoc_levels, msfinder_compound_levels, levels_scores, overwrite}{Input parameters to check.}

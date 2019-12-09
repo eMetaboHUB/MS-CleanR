@@ -4,8 +4,11 @@
 \alias{compute_massdiff}
 \title{Compute mass differences between 2 lists of adducts}
 \usage{
-compute_massdiff(user_adduct_pos = NA, user_adduct_neg = NA,
-  significance_mass_threshold = NA)
+compute_massdiff(
+  user_adduct_pos = NA,
+  user_adduct_neg = NA,
+  significance_mass_threshold = NA
+)
 }
 \arguments{
 \item{user_adduct_pos, user_adduct_neg}{An optional 2-column data.frame containing information about positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}

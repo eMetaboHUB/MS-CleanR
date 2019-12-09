@@ -72,6 +72,7 @@ get_project_file_path <- function(project_directory, filetype, source = NA, msfi
     if (filetype == "annotated_data-normalized")   return(file.path(wd, "annotated_MS_peaks-normalized.csv"))
     if (filetype == "final_CAD")                   return(file.path(wd, "CAD-cleaned.csv"))
     if (filetype == "final_PDA")                   return(file.path(wd, "PDA-cleaned.csv"))
+    if (filetype == "msp")                         return(file.path(wd, "peaks.msp"))
 
     stop_script("Unrecognized filetype: ", filetype)
 }
@@ -116,7 +117,9 @@ export_data <- function(data_to_export, project_directory, filetype, source = NA
 #' @eval recurrent_params("project_directory", "filetype")
 #' @param ... Additional parameters passed on to \code{\link{get_project_file_path}}.
 import_data <- function(project_directory, filetype, ...) {
-    return(utils::read.csv(get_project_file_path(project_directory, filetype, ...), stringsAsFactors = FALSE))
+    return(utils::read.csv(get_project_file_path(project_directory, filetype, ...),
+                           stringsAsFactors = FALSE,
+                           na.strings = c("NA", "", "N/A")))
 }
 
 

@@ -4,11 +4,22 @@
 \alias{check_input_parameters_msdial_data}
 \title{Check if input parameters are correct before running \code{clean_msdial_data}.}
 \usage{
-check_input_parameters_msdial_data(filter_blk, filter_blk_threshold,
-  filter_mz, filter_rsd, filter_rsd_threshold, threshold_mz, threshold_rt,
-  compute_pearson_correlation, pearson_threshold, pearson_p_value,
-  references_adduct_pos, references_adduct_neg, references_neutral,
-  overwrite)
+check_input_parameters_msdial_data(
+  filter_blk,
+  filter_blk_threshold,
+  filter_mz,
+  filter_rsd,
+  filter_rsd_threshold,
+  threshold_mz,
+  threshold_rt,
+  compute_pearson_correlation,
+  pearson_threshold,
+  pearson_p_value,
+  references_adduct_pos,
+  references_adduct_neg,
+  references_neutral,
+  overwrite
+)
 }
 \arguments{
 \item{filter_blk, filter_blk_threshold, filter_mz, filter_rsd, filter_rsd_threshold, threshold_mz, threshold_rt, compute_pearson_correlation, pearson_threshold, pearson_p_value, references_adduct_pos, references_adduct_neg, references_neutral, overwrite}{Input parameters to check.}

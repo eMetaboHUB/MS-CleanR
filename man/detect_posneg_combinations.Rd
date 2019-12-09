@@ -4,8 +4,13 @@
 \alias{detect_posneg_combinations}
 \title{Detect possible adducts, neutral losses and positive and negative peaks to combine.}
 \usage{
-detect_posneg_combinations(peaks_data_pos, peaks_data_neg, threshold_rt,
-  threshold_mz, adducts_massdiff)
+detect_posneg_combinations(
+  peaks_data_pos,
+  peaks_data_neg,
+  threshold_rt,
+  threshold_mz,
+  adducts_massdiff
+)
 }
 \arguments{
 \item{peaks_data_pos}{A data.frame containing positive peaks to treat, coming from MSDial.}

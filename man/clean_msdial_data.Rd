@@ -4,13 +4,23 @@
 \alias{clean_msdial_data}
 \title{Combine pos and neg files from MSDial and filter peaks according to user parameters}
 \usage{
-clean_msdial_data(project_directory, filter_blk = TRUE,
-  filter_blk_threshold = 0.8, filter_mz = TRUE, filter_rsd = TRUE,
-  filter_rsd_threshold = 30, threshold_mz = 0.05, threshold_rt = 0.1,
-  user_pos_adducts_refs = NA, user_neg_adducts_refs = NA,
-  user_neutral_refs = NA, compute_pearson_correlation = FALSE,
-  pearson_correlation_threshold = 0.8, pearson_p_value = 0.05,
-  overwrite = FALSE)
+clean_msdial_data(
+  project_directory,
+  filter_blk = TRUE,
+  filter_blk_threshold = 0.8,
+  filter_mz = TRUE,
+  filter_rsd = TRUE,
+  filter_rsd_threshold = 30,
+  threshold_mz = 0.05,
+  threshold_rt = 0.1,
+  user_pos_adducts_refs = NA,
+  user_neg_adducts_refs = NA,
+  user_neutral_refs = NA,
+  compute_pearson_correlation = FALSE,
+  pearson_correlation_threshold = 0.8,
+  pearson_p_value = 0.05,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

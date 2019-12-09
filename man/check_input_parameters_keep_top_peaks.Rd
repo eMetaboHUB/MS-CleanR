@@ -4,8 +4,12 @@
 \alias{check_input_parameters_keep_top_peaks}
 \title{Check if input parameters are correct before running \code{keep_top_peaks}.}
 \usage{
-check_input_parameters_keep_top_peaks(selection_criterion, n,
-  export_filtered_peaks, overwrite)
+check_input_parameters_keep_top_peaks(
+  selection_criterion,
+  n,
+  export_filtered_peaks,
+  overwrite
+)
 }
 \arguments{
 \item{selection_criterion, n, overwrite, export_filtered_peaks}{Input parameters to check.}

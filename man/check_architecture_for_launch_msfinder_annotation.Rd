@@ -4,8 +4,11 @@
 \alias{check_architecture_for_launch_msfinder_annotation}
 \title{Check project architecture before running \code{\link{launch_msfinder_annotation}}.}
 \usage{
-check_architecture_for_launch_msfinder_annotation(project_directory,
-  msfinder_biosoc_levels = NULL, overwrite = FALSE)
+check_architecture_for_launch_msfinder_annotation(
+  project_directory,
+  msfinder_biosoc_levels = NULL,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{project_directory}{The path of the project directory.}

@@ -4,9 +4,16 @@
 \alias{get_adducts_nl_links}
 \title{Detect possible neutral losses, isotopes and adduct links.}
 \usage{
-get_adducts_nl_links(data_to_treat, samples_cols, threshold_rt,
-  threshold_mz, detected_adducts, user_neutral_refs = NA,
-  user_pos_adducts_refs = NA, user_neg_adducts_refs = NA)
+get_adducts_nl_links(
+  data_to_treat,
+  samples_cols,
+  threshold_rt,
+  threshold_mz,
+  detected_adducts,
+  user_neutral_refs = NA,
+  user_pos_adducts_refs = NA,
+  user_neg_adducts_refs = NA
+)
 }
 \arguments{
 \item{data_to_treat}{A data.frame containing peaks data.}

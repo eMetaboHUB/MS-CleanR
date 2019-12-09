@@ -46,7 +46,7 @@
 #' @export
 launch_msfinder_annotation <- function(project_directory,
                                        compound_levels = NULL,  # c() = NULL
-                                       biosoc_levels = NULL,
+                                       biosoc_levels = c("generic"),
                                        levels_scores = NULL,
                                        overwrite = FALSE) {
 
@@ -98,14 +98,15 @@ launch_msfinder_annotation <- function(project_directory,
 
     # Merging with MSDial data
     msd_main_cols <- c("cluster", "cluster.size", "source", "id", "Alignment.ID", "Average.Rt.min.",
-                       "Average.Mz", "Adduct.type")
-    msf_main_cols <- c("level", "Compound_level", "rank.formula", "Formula", "rank.structure", "Structure", "Total.score")
+                       "Average.Mz", "Adduct.type", "MS.MS.spectrum")
+    msf_main_cols <- c("level", "rank.formula", "Formula", "rank.structure", "Structure", "Total.score")
     msf_other_cols <- names(msfinder_data)[!names(msfinder_data) %in% c(msf_main_cols,
                                                                         "source", "id", "Alignment.ID", "Databases.formula")]
 
     identifying_data <- merge(final_data, msfinder_data, by = c("id", "source", "Alignment.ID"), all.x = TRUE)
     identifying_data <- identifying_data[, c(msd_main_cols, msf_main_cols, msf_other_cols, samples$Column_name)]
     # sorting
+    biosoc_levels <- biosoc_levels[biosoc_levels != "generic"]
     identifying_data$level <- ordered(identifying_data$level, levels = c(biosoc_levels, "generic"))
     identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, level, -xtfrm(Total.score))),]
     export_data(identifying_data, project_directory, "identifying_data")
@@ -189,7 +190,11 @@ launch_msfinder_annotation <- function(project_directory,
     # msf_main_cols <- replace(msf_main_cols, length(msf_main_cols), "Final.score")  # replacing Total.score by Final.score
     msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
     identifying_data <- identifying_data[, c(c("annotation_result", "annotation", "annotation_warning"),
-                                             msd_main_cols, msf_main_cols, msf_other_cols, samples$Column_name)]
+                                             msd_main_cols[msd_main_cols != "MS.MS.spectrum"],
+                                             msf_main_cols,
+                                             msf_other_cols,
+                                             samples$Column_name,
+                                             "MS.MS.spectrum"),]
     identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Final.score))),]
     export_data(identifying_data, project_directory, "annotated_data", empty_na = TRUE)
 

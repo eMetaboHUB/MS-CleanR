@@ -4,8 +4,7 @@
 \alias{find_structure}
 \title{Find the most probable structure by iterating over all possible levels of annotations.}
 \usage{
-find_structure(possibilities, compound_levels = NULL,
-  biosoc_levels = NULL)
+find_structure(possibilities, compound_levels = NULL, biosoc_levels = NULL)
 }
 \arguments{
 \item{possibilities}{A data.frame of possible structures.}
