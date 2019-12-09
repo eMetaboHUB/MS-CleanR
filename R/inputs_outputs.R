@@ -72,7 +72,8 @@ get_project_file_path <- function(project_directory, filetype, source = NA, msfi
     if (filetype == "annotated_data-normalized")   return(file.path(wd, "annotated_MS_peaks-normalized.csv"))
     if (filetype == "final_CAD")                   return(file.path(wd, "CAD-cleaned.csv"))
     if (filetype == "final_PDA")                   return(file.path(wd, "PDA-cleaned.csv"))
-    if (filetype == "msp")                         return(file.path(wd, "peaks.msp"))
+    if (filetype == "msp_pos")                     return(file.path(wd, "peaks_pos.msp"))
+    if (filetype == "msp_neg")                     return(file.path(wd, "peaks_neg.msp"))
 
     stop_script("Unrecognized filetype: ", filetype)
 }

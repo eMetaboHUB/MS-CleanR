@@ -25,15 +25,23 @@ convert_csv_to_msp <- function(project_directory, min_score = 20) {
         csv_data[csv_data$IONMODE == "neg", "IONMODE"] <- "Negative"
         csv_data[csv_data$IONMODE == "pos", "IONMODE"] <- "Positive"
 
-        output <- ""
-        for (i in 1:nrow(csv_data)) {
-            output <- paste0(output, dataframe_row_to_txt(csv_data[i,]), "\n\n")
+        for (source in c("pos", "neg")) {
+            if (source == "pos") rows <- csv_data[csv_data$IONMODE == "Positive",]
+            else                 rows <- csv_data[csv_data$IONMODE == "Negative",]
+
+            if (nrow(rows) > 0) {
+                output <- ""
+                for (i in 1:nrow(rows)) {
+                    output <- paste0(output, dataframe_row_to_txt(rows[i,]), "\n\n")
+                }
+
+                output_file <- file(get_project_file_path(project_directory, paste0("msp_", source)))
+                writeLines(output, output_file)
+                close(output_file)
+            }
         }
 
-        output_file <- file(get_project_file_path(project_directory, "msp"))
-        writeLines(output, output_file)
-        close(output_file)
-        print_message("Peaks converted, see file", get_project_file_path(project_directory, "msp"),".")
+        print_message("Peaks converted, see MSP files in ", get_project_file_path(project_directory, "final_folder"),".")
     }
 }
 
@@ -41,7 +49,9 @@ convert_csv_to_msp <- function(project_directory, min_score = 20) {
 dataframe_row_to_txt <- function(df_row) {
     output <- ""
     for (n in names(df_row)[!names(df_row) %in% c("MSMS.COUNT", "MS.MS.SPECTRUM")]) {
-        output <- paste0(output, n, ": ", as.character(df_row[1, n]), "\n")
+        if (!is.na(df_row[1, n]) & !is.null(df_row[1, n]) & df_row[1, n] != "") {
+            output <- paste0(output, n, ": ", as.character(df_row[1, n]), "\n")
+        }
     }
     output <- paste0(output,
                      "MSTYPE: MS2\n",
