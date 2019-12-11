@@ -15,11 +15,11 @@ import_msfinder_data <- function(project_directory, source, level) {
                     suffixes = c(".formula", ".structure"),
                     all.x = TRUE)
     global <- global[!is.na(global$Structure),]
-    global$source <- source
-    global$id <- as.character(paste0(global$source, "_", global$Alignment.ID))
 
-    if (nrow(global) == 0) return(global)
+    if (nrow(global) == 0) return(NULL)
     else {
+        global$source <- source
+        global$id <- as.character(paste0(global$source, "_", global$Alignment.ID))
         global$level <- level
 
         if (level == "generic") global$Links <- global$Databases.structure

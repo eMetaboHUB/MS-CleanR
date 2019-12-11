@@ -1,7 +1,7 @@
 
 #' Combine pos and neg files from MSDial and filter peaks according to user parameters
 #'
-#' @eval recurrent_params("project_directory", "filter_blk", "filter_blk_threshold", "filter_mz", "filter_rsd", "filter_rsd_threshold", "threshold_rt", "threshold_mz", "user_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs", "overwrite")
+#' @eval recurrent_params("project_directory", "filter_blk", "filter_blk_threshold", "filter_mz", "filter_rsd", "filter_rsd_threshold", "threshold_rt", "threshold_mz", "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs", "overwrite")
 #' @param compute_pearson_correlation Compute Pearson correlation between peaks to detect clusters.
 #' @param pearson_correlation_threshold Ignore links having a Pearson correlation < threshold (default: 0.8).
 #' @param pearson_p_value Ignore links having a non-significative Pearson correlation (default: 0.05).
@@ -52,7 +52,8 @@ clean_msdial_data <- function(project_directory,
                               threshold_rt = 0.1,
                               user_pos_adducts_refs = NA,
                               user_neg_adducts_refs = NA,
-                              user_neutral_refs = NA,
+                              user_pos_neutral_refs = NA,
+                              user_neg_neutral_refs = NA,
                               compute_pearson_correlation = FALSE,
                               pearson_correlation_threshold = 0.8,
                               pearson_p_value = 0.05,
@@ -70,7 +71,8 @@ clean_msdial_data <- function(project_directory,
                                        pearson_p_value             = pearson_p_value,
                                        references_adduct_pos       = user_pos_adducts_refs,
                                        references_adduct_neg       = user_neg_adducts_refs,
-                                       references_neutral          = user_neutral_refs,
+                                       references_neutral_pos      = user_pos_neutral_refs,
+                                       references_neutral_neg      = user_neg_neutral_refs,
                                        overwrite                   = overwrite)
 
     check_architecture_for_clean_msdial_data(project_directory, overwrite)
@@ -177,7 +179,8 @@ clean_msdial_data <- function(project_directory,
                                      threshold_rt,
                                      threshold_mz,
                                      msdial_detected_adducts,
-                                     user_neutral_refs,
+                                     user_pos_neutral_refs,
+                                     user_neg_neutral_refs,
                                      user_pos_adducts_refs,
                                      user_neg_adducts_refs)
 

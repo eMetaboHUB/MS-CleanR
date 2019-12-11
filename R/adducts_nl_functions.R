@@ -1,7 +1,7 @@
 
 #' Detect possible neutral losses, isotopes and adduct links.
 #'
-#' @eval recurrent_params("threshold_rt", "threshold_mz", "user_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs")
+#' @eval recurrent_params("threshold_rt", "threshold_mz", "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs")
 #' @param data_to_treat A data.frame containing peaks data.
 #' @param samples_cols A list of string containing the names of samples columns.
 #' @param detected_adducts A data.frame indicating which adducts were detected by MSDial.
@@ -11,7 +11,8 @@ get_adducts_nl_links <- function(data_to_treat,
                                  threshold_rt,
                                  threshold_mz,
                                  detected_adducts,
-                                 user_neutral_refs = NA,
+                                 user_pos_neutral_refs = NA,
+                                 user_neg_neutral_refs = NA,
                                  user_pos_adducts_refs = NA,
                                  user_neg_adducts_refs = NA) {
     clusters_pos <- unique(data_to_treat[data_to_treat$source == "pos",]$cluster.msdial)
@@ -23,11 +24,11 @@ get_adducts_nl_links <- function(data_to_treat,
     mass_isotopes <- get("mass_isotopes", envir=environment())  # redundant, but makes the syntax checker happy
 
     # pos
-    if (is.na(user_neutral_refs)) {
+    if (is.na(user_pos_neutral_refs)) {
         utils::data("mass_neutral_loss_pos", package="mscleanr", envir=environment())
         current_mass_nl <- get("mass_neutral_loss_pos", envir=environment())  # redundant, but makes the syntax checker happy
     } else {
-        current_mass_nl <- user_neutral_refs
+        current_mass_nl <- user_pos_neutral_refs
         names(current_mass_nl) <- c("name", "m")
     }
     for (cpos in clusters_pos) {
@@ -41,11 +42,11 @@ get_adducts_nl_links <- function(data_to_treat,
     }
 
     # neg
-    if (is.na(user_neutral_refs)) {
+    if (is.na(user_neg_neutral_refs)) {
         utils::data("mass_neutral_loss_neg", package="mscleanr", envir=environment())
         current_mass_nl <- get("mass_neutral_loss_neg", envir=environment())  # redundant, but makes the syntax checker happy
     } else {
-        current_mass_nl <- user_neutral_refs
+        current_mass_nl <- user_neg_neutral_refs
         names(current_mass_nl) <- c("name", "m")
     }
     for (cneg in clusters_neg) {

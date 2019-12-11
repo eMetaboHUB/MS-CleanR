@@ -28,7 +28,7 @@ get_doc <- function() {
         "source"                = '@param source A string indicating which mode to read from: "pos" or "neg".',
         "threshold_mz"          = "@param threshold_mz A numerical value indicating the mass tolerance in Dalton for the detection of adducts and neutral losses.",
         "threshold_rt"          = "@param threshold_rt A numerical value indicating the retention time tolerance.",
-        "user_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs" = "@param user_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used."
+        "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs" = "@param user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used."
     ))
 }
 

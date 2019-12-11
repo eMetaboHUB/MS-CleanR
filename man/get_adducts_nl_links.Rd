@@ -10,7 +10,8 @@ get_adducts_nl_links(
   threshold_rt,
   threshold_mz,
   detected_adducts,
-  user_neutral_refs = NA,
+  user_pos_neutral_refs = NA,
+  user_neg_neutral_refs = NA,
   user_pos_adducts_refs = NA,
   user_neg_adducts_refs = NA
 )
@@ -26,7 +27,7 @@ get_adducts_nl_links(
 
 \item{detected_adducts}{A data.frame indicating which adducts were detected by MSDial.}
 
-\item{user_neutral_refs, user_pos_adducts_refs, user_neg_adducts_refs}{An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}
+\item{user_neg_neutral_refs, user_pos_neutral_refs, user_pos_adducts_refs, user_neg_adducts_refs}{An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}
 }
 \value{
 A list of 3 data.frames: "links" containing detected links, "computed_massdiff" containing all pairs of positive/negative adducts pair mass differences and "filtered_massdiff" containing pairs of positive/negative adducts pair mass differences for adducts pair detected by MSDial.

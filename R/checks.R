@@ -82,7 +82,7 @@ check_main_architecture <- function(project_directory) {
 
 #' Check if input parameters are correct before running \code{clean_msdial_data}.
 #'
-#' @param filter_blk,filter_blk_threshold,filter_mz,filter_rsd,filter_rsd_threshold,threshold_mz,threshold_rt,compute_pearson_correlation,pearson_threshold,pearson_p_value,references_adduct_pos,references_adduct_neg,references_neutral,overwrite Input parameters to check.
+#' @param filter_blk,filter_blk_threshold,filter_mz,filter_rsd,filter_rsd_threshold,threshold_mz,threshold_rt,compute_pearson_correlation,pearson_threshold,pearson_p_value,references_adduct_pos,references_adduct_neg,references_neutral_pos,references_neutral_neg,overwrite Input parameters to check.
 check_input_parameters_msdial_data <- function(filter_blk,
                                                filter_blk_threshold,
                                                filter_mz,
@@ -95,7 +95,8 @@ check_input_parameters_msdial_data <- function(filter_blk,
                                                pearson_p_value,
                                                references_adduct_pos,
                                                references_adduct_neg,
-                                               references_neutral,
+                                               references_neutral_pos,
+                                               references_neutral_neg,
                                                overwrite) {
     check_boolean(filter_blk,                  "filter_blk")
     check_boolean(filter_mz,                   "filter_mz")
@@ -112,9 +113,10 @@ check_input_parameters_msdial_data <- function(filter_blk,
 
     check_positive_int(filter_rsd_threshold,     "filter_rsd_threshold")
 
-    check_references(references_adduct_pos, "positive adducts")
-    check_references(references_adduct_neg, "negative adducts")
-    check_references(references_neutral,    "neutral losses")
+    check_references(references_adduct_pos,  "positive adducts")
+    check_references(references_adduct_neg,  "negative adducts")
+    check_references(references_neutral_pos, "positive neutral losses")
+    check_references(references_neutral_neg, "negative neutral losses")
 }
 
 

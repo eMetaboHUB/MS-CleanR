@@ -15,7 +15,8 @@ clean_msdial_data(
   threshold_rt = 0.1,
   user_pos_adducts_refs = NA,
   user_neg_adducts_refs = NA,
-  user_neutral_refs = NA,
+  user_pos_neutral_refs = NA,
+  user_neg_neutral_refs = NA,
   compute_pearson_correlation = FALSE,
   pearson_correlation_threshold = 0.8,
   pearson_p_value = 0.05,
@@ -39,7 +40,7 @@ clean_msdial_data(
 
 \item{threshold_rt}{A numerical value indicating the retention time tolerance.}
 
-\item{user_neutral_refs, user_pos_adducts_refs, user_neg_adducts_refs}{An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}
+\item{user_neg_neutral_refs, user_pos_neutral_refs, user_pos_adducts_refs, user_neg_adducts_refs}{An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}
 
 \item{compute_pearson_correlation}{Compute Pearson correlation between peaks to detect clusters.}
 

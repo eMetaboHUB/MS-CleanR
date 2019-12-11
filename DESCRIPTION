@@ -28,7 +28,9 @@ Imports:
     Hmisc,
     gtools,
     speaq,
-    fuzzyjoin
+    fuzzyjoin,
+    shiny,
+    shinythemes
 Suggests: 
     knitr,
     rmarkdown,

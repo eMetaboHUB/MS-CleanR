@@ -79,9 +79,11 @@ launch_msfinder_annotation <- function(project_directory,
                 for (name in main_names) if (!name %in% tmp_names)  msf_tmp[name]       <- NA
                 for (name in tmp_names)  if (!name %in% main_names) msfinder_data[name] <- NA
             }
-            suppressWarnings(  # Column class mismatch for 'Classyfire_subclass'. Converting column to class 'character'.
-                msfinder_data <- gtools::smartbind(msfinder_data, msf_tmp)
-            )
+            if (!is.null(msf_tmp)) {
+                suppressWarnings(  # Column class mismatch for 'Classyfire_subclass'. Converting column to class 'character'.
+                    msfinder_data <- gtools::smartbind(msfinder_data, msf_tmp)
+                )
+            }
         }
     }
 
