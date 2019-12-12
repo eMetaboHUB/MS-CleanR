@@ -323,9 +323,9 @@ clean_msdial_data <- function(project_directory,
 
 
     # CLUSTERS MSDIAL + ADDUCTS/NL
-    g <- igraph::graph_from_data_frame(final_links[, c("CpdID.1", "CpdID.2")],
-                                       vertices = final_data[,c("id", "Average.Rt.min.", "Average.Mz",
-                                                                "Adduct.type", "Alignment.ID", "source")],
+    g <- igraph::graph_from_data_frame(final_links[, c("CpdID.1", "CpdID.2", "simple.nature", "Correlation", "source")],
+                                       vertices = final_data[c("id", "Average.Rt.min.", "Average.Mz",
+                                                               "Adduct.type", "Alignment.ID", "source")],
                                        directed = FALSE)
     rel_clusters <- igraph::cluster_louvain(g)
     igraph::V(g)$cluster <- rel_clusters$membership
