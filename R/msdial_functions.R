@@ -59,8 +59,14 @@ import_msdial_data <- function(project_directory, filter_blk, filter_blk_thresho
     else                                          peak_data$ratio_Blank <- peak_data$avg_Blank / peak_data$avg_Samples
 
     # filters
-    if (filter_blk) peak_data <- peak_data[peak_data$ratio_Blank < filter_blk_threshold,]
-    if (filter_mz)  peak_data <- peak_data[grep("\\.[89]", peak_data$Average.Mz, invert = TRUE),]
+    if (filter_blk) {
+        export_data(peak_data[peak_data$ratio_Blank >= filter_blk_threshold,], project_directory, "deleted_blk")
+        peak_data <- peak_data[peak_data$ratio_Blank < filter_blk_threshold,]
+    }
+    if (filter_mz) {
+        export_data(peak_data[grep("\\.[89]", peak_data$Average.Mz),], project_directory, "deleted_mz")
+        peak_data <- peak_data[grep("\\.[89]", peak_data$Average.Mz, invert = TRUE),]
+    }
     if (filter_rsd) {
         for (class in unique(samples[samples$Script_class != "Blank",]$Script_class)) {
             peak_data[paste0("rsd_", class)] <- peak_data[paste0("sd_", class)] * 100 / peak_data[paste0("avg_", class)]
@@ -69,6 +75,7 @@ import_msdial_data <- function(project_directory, filter_blk, filter_blk_thresho
             }
         }
         peak_data$rsd_min <- apply(peak_data[startsWith(names(peak_data), "rsd_")], 1, min, na.rm = TRUE)
+        export_data(peak_data[peak_data$rsd_min < filter_rsd_threshold,], project_directory, "deleted_rsd")
         peak_data <- peak_data[peak_data$rsd_min < filter_rsd_threshold,]
     }
 
