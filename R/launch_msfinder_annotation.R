@@ -122,21 +122,21 @@ launch_msfinder_annotation <- function(project_directory,
     identifying_data$annotation_warning <- NA
 
     # Clusters of size 1 or 2 without identification and with links: Ignored
-    print_message("*** Ignoring small clusters without identification and with links ***")
-    for(ignored_size in c(1, 2)) {
-        small_clusters <- dplyr::count(identifying_data[identifying_data$cluster.size == ignored_size
-                                                        & is.na(identifying_data$level),],
-                                       .data$cluster)
-        for(cluster_id in small_clusters[small_clusters$n == ignored_size,]$cluster) {
-            cluster_links <- final_links[   final_links$simple.nature != "found in higher mz's MsMs"
-                                         &  final_links$simple.nature != "similar chromatogram in higher mz"
-                                         & (final_links$cluster.1 == cluster_id | final_links$cluster.2 == cluster_id)
-                                         &  final_links$cluster.2 != final_links$cluster.1,]
-            if(nrow(cluster_links) > 0) {
-                identifying_data[identifying_data$cluster == cluster_id,]$annotation_result <- "Ignored"
-            }
-        }
-    }
+    # print_message("*** Ignoring small clusters without identification and with links ***")
+    # for(ignored_size in c(1, 2)) {
+    #     small_clusters <- dplyr::count(identifying_data[identifying_data$cluster.size == ignored_size
+    #                                                     & is.na(identifying_data$level),],
+    #                                    .data$cluster)
+    #     for(cluster_id in small_clusters[small_clusters$n == ignored_size,]$cluster) {
+    #         cluster_links <- final_links[   final_links$simple.nature != "found in higher mz's MsMs"
+    #                                      &  final_links$simple.nature != "similar chromatogram in higher mz"
+    #                                      & (final_links$cluster.1 == cluster_id | final_links$cluster.2 == cluster_id)
+    #                                      &  final_links$cluster.2 != final_links$cluster.1,]
+    #         if(nrow(cluster_links) > 0) {
+    #             identifying_data[identifying_data$cluster == cluster_id,]$annotation_result <- "Ignored"
+    #         }
+    #     }
+    # }
 
     # Clusters with a pair [M+H]+ / [M-H]-
     print_message("*** Annotating clusters with [M+H]+ / [M-H]- couples ***")
