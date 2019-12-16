@@ -4,10 +4,7 @@
 \alias{check_main_architecture}
 \title{Check the project main architecture}
 \usage{
-check_main_architecture(project_directory)
-}
-\arguments{
-\item{project_directory}{The path of the project directory.}
+check_main_architecture()
 }
 \description{
 Check the project main architecture

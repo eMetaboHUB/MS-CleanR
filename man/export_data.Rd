@@ -4,18 +4,10 @@
 \alias{export_data}
 \title{Export data for users.}
 \usage{
-export_data(
-  data_to_export,
-  project_directory,
-  filetype,
-  source = NA,
-  empty_na = FALSE
-)
+export_data(data_to_export, filetype, source = NA, empty_na = FALSE)
 }
 \arguments{
 \item{data_to_export}{A data.frame to export to the user file system.}
-
-\item{project_directory}{The path of the project directory.}
 
 \item{filetype}{A string indicating the needed directory or file.}
 

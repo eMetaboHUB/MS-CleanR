@@ -4,24 +4,14 @@
 \alias{keep_top_peaks}
 \title{Filter peaks based on a given criterion.}
 \usage{
-keep_top_peaks(
-  project_directory,
-  selection_criterion,
-  n = 1,
-  export_filtered_peaks = TRUE,
-  overwrite = FALSE
-)
+keep_top_peaks(selection_criterion, n = 1, export_filtered_peaks = TRUE)
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{selection_criterion}{"intensity" or "degree" or "both".}
 
 \item{n}{Keep only n.top peaks by clusters if intensity or degree filters.}
 
 \item{export_filtered_peaks}{Copy peaks files corresponding to the peaks remaining after filtering in a new folder.}
-
-\item{overwrite}{A boolean indicating whether to stop the script if there is an existing analysis or overwrite it.}
 }
 \description{
 Keeps \code{n} peaks by cluster.

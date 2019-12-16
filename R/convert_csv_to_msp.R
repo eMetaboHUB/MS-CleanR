@@ -1,12 +1,11 @@
 
 #' Convert the final CSV file post annotations to MSP format.
 #'
-#' @eval recurrent_params("project_directory")
 #' @param min_score Peaks must have a final score >= \code{min_score} to be exported to the msp file.
 #' @export
-convert_csv_to_msp <- function(project_directory, min_score = 20) {
-    csv_data <- import_data(project_directory, "annotated_data-normalized")
-    samples <- import_data(project_directory, "samples")
+convert_csv_to_msp <- function(min_score = 20) {
+    csv_data <- import_data("annotated_data-normalized")
+    samples <- import_data("samples")
 
     mandatory <- c("Structure", "Formula", "source", "Average.Rt.min.", "PRECURSORMZ", "PRECURSORTYPE", "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")
     # optional <- c("Ontology", "Classyfire_subclass", "level", "Compound_level", "Internal_id")
@@ -35,13 +34,13 @@ convert_csv_to_msp <- function(project_directory, min_score = 20) {
                     output <- paste0(output, dataframe_row_to_txt(rows[i,]), "\n\n")
                 }
 
-                output_file <- file(get_project_file_path(project_directory, paste0("msp_", source)))
+                output_file <- file(get_project_file_path(paste0("msp_", source)))
                 writeLines(output, output_file)
                 close(output_file)
             }
         }
 
-        print_message("Peaks converted, see MSP files in ", get_project_file_path(project_directory, "final_folder"),".")
+        print_message("Peaks converted, see MSP files in ", get_project_file_path("final_folder"),".")
     }
 }
 

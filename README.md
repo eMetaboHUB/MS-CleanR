@@ -11,10 +11,9 @@ Needs MSDial v4.00 or higher.
 devtools::install_github("SyrupType/mscleanr")
 library(mscleanr)
 
-project_directory <- "/Users/ofv/Analyses/CAD-camomilla"
+choose_project_directory("/Users/ofv/Analyses/CAD-camomilla", overwrite = TRUE)
 
-clean_msdial_data(project_directory,
-                  filter_blk = TRUE,
+clean_msdial_data(filter_blk = TRUE,
                   filter_blk_threshold = 0.8,
                   filter_mz = TRUE,
                   filter_rsd = TRUE,
@@ -27,20 +26,15 @@ clean_msdial_data(project_directory,
                   user_neg_neutral_refs = NA,
                   compute_pearson_correlation = TRUE,
                   pearson_correlation_threshold = 0.8,
-                  pearson_p_value = 0.05,
-                  overwrite = TRUE)
+                  pearson_p_value = 0.05)
 
-keep_top_peaks(project_directory,
-               selection_criterion = "degree",
+keep_top_peaks(selection_criterion = "degree",
                n = 1,
-               export_filtered_peaks = TRUE,
-               overwrite = TRUE)
+               export_filtered_peaks = TRUE)
 
-launch_msfinder_annotation(project_directory,
-                           compound_levels = c("1a", "1b"),
+launch_msfinder_annotation(compound_levels = c("1a", "1b"),
                            biosoc_levels = c("genre", "family"),
-                           levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
-                           overwrite = TRUE)
+                           levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5))
                            
-convert_csv_to_msp(project_directory, min_score = 20)
+convert_csv_to_msp(min_score = 20)
 ```

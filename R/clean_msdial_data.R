@@ -1,12 +1,12 @@
 
 #' Combine pos and neg files from MSDial and filter peaks according to user parameters
 #'
-#' @eval recurrent_params("project_directory", "filter_blk", "filter_blk_threshold", "filter_mz", "filter_rsd", "filter_rsd_threshold", "threshold_rt", "threshold_mz", "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs", "overwrite")
+#' @eval recurrent_params("filter_blk", "filter_blk_threshold", "filter_mz", "filter_rsd", "filter_rsd_threshold", "threshold_rt", "threshold_mz", "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs")
 #' @param compute_pearson_correlation Compute Pearson correlation between peaks to detect clusters.
 #' @param pearson_correlation_threshold Ignore links having a Pearson correlation < threshold (default: 0.8).
 #' @param pearson_p_value Ignore links having a non-significative Pearson correlation (default: 0.05).
 #'
-#' @section Architecture needed by clean_msdial_data in \code{<project_directory>}:
+#' @section Architecture needed by clean_msdial_data in the project directory:
 #' \itemize{
 #'   \item pos
 #'   \describe{
@@ -20,7 +20,7 @@
 #'   }
 #' }
 #'
-#' @section Output files of clean_msdial_data in \code{<project_directory>}:
+#' @section Output files of clean_msdial_data in the project directory:
 #' \itemize{
 #'   \item pos
 #'   \describe{
@@ -42,8 +42,7 @@
 #' }
 #'
 #' @export
-clean_msdial_data <- function(project_directory,
-                              filter_blk = TRUE,
+clean_msdial_data <- function(filter_blk = TRUE,
                               filter_blk_threshold = 0.8,
                               filter_mz = TRUE,
                               filter_rsd = TRUE,
@@ -56,8 +55,7 @@ clean_msdial_data <- function(project_directory,
                               user_neg_neutral_refs = NA,
                               compute_pearson_correlation = FALSE,
                               pearson_correlation_threshold = 0.8,
-                              pearson_p_value = 0.05,
-                              overwrite = FALSE) {
+                              pearson_p_value = 0.05) {
 
     check_input_parameters_msdial_data(filter_blk                  = filter_blk,
                                        filter_blk_threshold        = filter_blk_threshold,
@@ -72,15 +70,13 @@ clean_msdial_data <- function(project_directory,
                                        references_adduct_pos       = user_pos_adducts_refs,
                                        references_adduct_neg       = user_neg_adducts_refs,
                                        references_neutral_pos      = user_pos_neutral_refs,
-                                       references_neutral_neg      = user_neg_neutral_refs,
-                                       overwrite                   = overwrite)
+                                       references_neutral_neg      = user_neg_neutral_refs)
 
-    check_architecture_for_clean_msdial_data(project_directory, overwrite)
+    check_architecture_for_clean_msdial_data()
 
-    print_message("*** Treating ", project_directory, " ***")
+    print_message("*** Treating ", get("project_directory", envir = mscleanrCache), " ***")
 
-    export_params(project_directory,
-                  filter_blk                  = filter_blk,
+    export_params(filter_blk                  = filter_blk,
                   filter_blk_threshold        = filter_blk_threshold,
                   filter_mz                   = filter_mz,
                   filter_rsd                  = filter_rsd,
@@ -92,17 +88,17 @@ clean_msdial_data <- function(project_directory,
                   pearson_p_value             = pearson_p_value)
 
     # MSDIAL
-    msdial <- import_msdial_data(project_directory, filter_blk, filter_blk_threshold, filter_mz, filter_rsd, filter_rsd_threshold)
+    msdial <- import_msdial_data(filter_blk, filter_blk_threshold, filter_mz, filter_rsd, filter_rsd_threshold)
     msdial_peak_data <- msdial$peak_data[!grepl('NA', rownames(msdial$peak_data)),]  # Fix for occasional small bug
     print_peaks_status(msdial_peak_data, "MSDial peaks after filtering:")
     msdial_links <- msdial$links
     print_message("MSDial links: ", nrow(msdial_links))
     print_message(nrow(msdial$identified_peaks), " peaks identified by MSDial")
-    export_data(msdial$identified_peaks, project_directory, "msdial_identified_peaks")
+    export_data(msdial$identified_peaks, "msdial_identified_peaks")
     msdial_detected_adducts <- msdial$detected_adducts
-    export_data(msdial_detected_adducts, project_directory, "msdial_detected_adducts")
+    export_data(msdial_detected_adducts, "msdial_detected_adducts")
     samples <- msdial$samples
-    export_data(samples, project_directory, "samples")
+    export_data(samples, "samples")
     rm(msdial)
 
 
@@ -170,7 +166,7 @@ clean_msdial_data <- function(project_directory,
     final_data <- merge(final_data, cluster_sizes)
     print_message("Clusters detected with MSDial data: ", length(levels(factor(msdial_clusters$membership))))
 
-    export_data(final_data, project_directory, "clusters_msdial")
+    export_data(final_data, "clusters_msdial")
 
 
     # Adducts/Neutral losses
@@ -184,8 +180,8 @@ clean_msdial_data <- function(project_directory,
                                      user_pos_adducts_refs,
                                      user_neg_adducts_refs)
 
-    export_data(msc_data$computed_massdiff, project_directory, "computed_massdiff")
-    export_data(msc_data$filtered_massdiff, project_directory, "filtered_computed_massdiff")
+    export_data(msc_data$computed_massdiff, "computed_massdiff")
+    export_data(msc_data$filtered_massdiff, "filtered_computed_massdiff")
     msc_global <- msc_data$links
     if(nrow(msc_global) > 0) msc_global$source <- "Adducts/Neutral losses"
     print_message("Adducts and neutral losses links: ", nrow(msc_global))
@@ -230,7 +226,7 @@ clean_msdial_data <- function(project_directory,
                             suffixes = c(".1", ".2"))
     weighted_links$weight <- weighted_links$p.1 * weighted_links$p.2
     final_links <- gtools::smartbind(weighted_links, final_links[final_links$simple.nature != "pol / adduct",])
-    export_data(final_links, project_directory, "links_ms_pre_selection")
+    export_data(final_links, "links_ms_pre_selection")
 
 
     # GRAPH OF ADDUCTS
@@ -239,7 +235,7 @@ clean_msdial_data <- function(project_directory,
     filtered_links$node.1 <- paste(filtered_links$CpdID.1, filtered_links$Adduct.1, sep = "::")
     filtered_links$node.2 <- paste(filtered_links$CpdID.2, filtered_links$Adduct.2, sep = "::")
     g <- igraph::graph_from_data_frame(filtered_links[, c("node.1", "node.2", "weight")], directed = FALSE)
-    export_data(g, project_directory, "adduct_links_graph")
+    export_data(g, "adduct_links_graph")
     rm(filtered_links)
 
     final_peaks_adducts <- data.frame()
@@ -268,7 +264,7 @@ clean_msdial_data <- function(project_directory,
         }
         # Back to step 2 until length(igraph::V(g)) == nrow(final_peaks_adducts)
     }
-    export_data(g, project_directory, "final_links_graph")
+    export_data(g, "final_links_graph")
 
     # Correction of adducts in final_data
     final_peaks_adducts$name <- NULL
@@ -298,8 +294,8 @@ clean_msdial_data <- function(project_directory,
                         by = "id", all.x = TRUE)
     final_data[is.na(final_data$strength),]$strength <- 0  # Fix: some strength are NA
 
-    export_data(final_links, project_directory, "links_ms_post_selection")
-    export_data(final_peaks_adducts, project_directory, "final_adducts_data")
+    export_data(final_links, "links_ms_post_selection")
+    export_data(final_peaks_adducts, "final_adducts_data")
 
 
     # DEALING WITH MERS
@@ -334,7 +330,7 @@ clean_msdial_data <- function(project_directory,
                                    cluster = igraph::V(g)$cluster),
                         by = "id",
                         all.x = TRUE)
-    export_data(g, project_directory, "clusters_graph")
+    export_data(g, "clusters_graph")
 
     # Adding cluster size
     cluster_sizes <- dplyr::count(final_data, .data$cluster)
@@ -349,13 +345,13 @@ clean_msdial_data <- function(project_directory,
     final_links <- final_links[, c("source", "cluster.1", "cluster.2", "cluster.msdial.1", "cluster.msdial.2",
                                    "CpdID.1", "CpdID.2", "simple.nature", "Adduct.1", "Adduct.2", "RT.1", "RT.2",
                                    "Mass.1", "Mass.2", "Mean.1", "Mean.2", "N.1", "N.2", "Correlation")]
-    export_data(final_links, project_directory, "links_ms_final")
+    export_data(final_links, "links_ms_final")
 
     ord.columns <- c("cluster", "cluster.size", "cluster.msdial", "cluster.msdial.size", "strength", "id", "source",
                      "Alignment.ID", "Average.Rt.min.", "Average.Mz", "Adduct.type", "Post.curation.result",
                      "Fill..", "S.N.average", "Spectrum.reference.file.name", "MS1.isotopic.spectrum", "MS.MS.spectrum")
     final_data <- final_data[, c(ord.columns, names(final_data)[!names(final_data) %in% ord.columns])]
-    export_data(final_data, project_directory, "clusters_final")
+    export_data(final_data, "clusters_final")
 
     print_message("Cleaning done.")
 }

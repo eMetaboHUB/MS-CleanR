@@ -4,11 +4,9 @@
 \alias{check_path}
 \title{Check if a path exist.}
 \usage{
-check_path(project_directory, filetype, stop = TRUE, na_msg = NA, ...)
+check_path(filetype, stop = TRUE, na_msg = NA, ...)
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{filetype}{A string indicating the needed directory or file.}
 
 \item{stop}{If \code{TRUE}, stops the script if a path is not found.}

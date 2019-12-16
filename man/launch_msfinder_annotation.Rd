@@ -5,28 +5,22 @@
 \title{Annotates peaks based on files extracted from MSFinder.}
 \usage{
 launch_msfinder_annotation(
-  project_directory,
   compound_levels = NULL,
   biosoc_levels = c("generic"),
-  levels_scores = NULL,
-  overwrite = FALSE
+  levels_scores = NULL
 )
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{compound_levels}{A vector containing the compound levels to consider, in the given order.}
 
 \item{biosoc_levels}{A vector containing the biosource levels to consider, in the given order.}
 
 \item{levels_scores}{A list of levels names and their corresponding multiplier to adapt final annotation scores.}
-
-\item{overwrite}{A boolean indicating whether to stop the script if there is an existing analysis or overwrite it.}
 }
 \description{
 Annotates peaks based on files extracted from MSFinder.
 }
-\section{Architecture needed by launch_msfinder_annotation in \code{<project_directory>}}{
+\section{Architecture needed by launch_msfinder_annotation in the project_directory}{
 
 \itemize{
   \item pos
@@ -54,7 +48,7 @@ Annotates peaks based on files extracted from MSFinder.
 }
 }
 
-\section{Output files of launch_msfinder_annotation in \code{<project_directory>}}{
+\section{Output files of launch_msfinder_annotation in the project directory}{
 
 \describe{
   \item{annotated_data-cleaned.csv}{Final auto-annotated data with only relevant peaks}

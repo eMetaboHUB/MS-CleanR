@@ -4,11 +4,9 @@
 \alias{get_samples_info}
 \title{Get samples names and class from an MSDial file and generate column names.}
 \usage{
-get_samples_info(project_directory, source = "pos")
+get_samples_info(source = "pos")
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{source}{A string indicating which mode to read from: "pos" or "neg".}
 }
 \value{

@@ -4,18 +4,10 @@
 \alias{check_architecture_for_keep_top_peaks}
 \title{Check project architecture before running \code{\link{keep_top_peaks}}.}
 \usage{
-check_architecture_for_keep_top_peaks(
-  project_directory,
-  export_filtered_peaks,
-  overwrite = FALSE
-)
+check_architecture_for_keep_top_peaks(export_filtered_peaks)
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{export_filtered_peaks}{Copy peaks files corresponding to the peaks remaining after filtering in a new folder.}
-
-\item{overwrite}{A boolean indicating whether to stop the script if there is an existing analysis or overwrite it.}
 }
 \description{
 Check project architecture before running \code{\link{keep_top_peaks}}.

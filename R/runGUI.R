@@ -16,25 +16,79 @@ runGUI <- function() {
     utils::data("mass_isotopes", package="mscleanr", envir=environment())
     mass_isotopes <- get("mass_isotopes", envir=environment())  # redundant, but makes the syntax checker happy
 
+    # personalized elements
+    referenceInput <- function(id, text) {
+        shiny::tabPanel(text,
+            shiny::fluidRow(
+                shiny::column(8,
+                    shiny::fileInput(id,
+                                     paste0("(OPTIONAL) Upload a CSV reference file for ", tolower(text), "."),
+                                     accept = ".csv",
+                                     placeholder = "  No file selected",
+                                     width = "100%")
+                ),
+                shiny::column(4, shiny::tableOutput(id))
+            )
+        )
+    }
+
+    levelsInput <- function(id, label, placeholder) {
+        shiny::textInput(id,
+                         paste0("Indicate the ", label,", separated by commas (leave blank if none)."),
+                         placeholder = placeholder,
+                         width = "90%")
+    }
+
+    mainButton <- function(id, label) shiny::actionButton(id, label,  width = "100%", class = "btn btn-primary")
+
+    warning_wd <- function() {
+        shiny::conditionalPanel(
+            condition = "document.getElementById('button_clean').disabled",
+            shiny::div(class = "panel panel-warning",
+                shiny::div(class = "panel-heading",
+                    shiny::h3(class = "panel-title", "Please select the project directory.")
+                )
+            )
+        )
+    }
+
+
 
     ui <- shiny::tagList(
+        shinyjs::useShinyjs(),
+        waiter::use_waiter(),
+
+        tags$head(
+            tags$style(
+                HTML(".shiny-notification {
+                     position:fixed;
+                     top: calc(50%);
+                     left: calc(50%);
+                     }"
+                )
+            )
+        ),
+
         shiny::navbarPage(
             theme = shinythemes::shinytheme("paper"),
             "mscleanr",
 
-
             shiny::tabPanel(
-                "Global parameters",
+                "Project directory",
 
                 shiny::sidebarPanel(
-                    shiny::h2("TODO"),
-                    "Help message."
+                    shiny::h5("Project directory"),
+                    "Select the directory containing the data you want to analyze.",
+                    shiny::br(),
+                    shiny::h5("Overwrite"),
+                    "If checked, any existing file resulting from a previous analysis will be overwritten without asking."
                 ),
 
                 shiny::mainPanel(
+                    warning_wd(),
                     #                   project_directory,
-                    # TODO
-                    #fileInput("upload", NULL),
+                    shinyDirectoryInput::directoryInput("project_directory",
+                                                        label = "Select the project directory"),
                     #                   overwrite = TRUE)
                     shiny::checkboxInput("overwrite",
                                          "Overwrite existing results?",
@@ -47,11 +101,23 @@ runGUI <- function() {
                 "Clean MS-DIAL data",
 
                 shiny::sidebarPanel(
-                    shiny::h2("TODO"),
-                    "Help message."
+                    shiny::h5("Filters"),
+                    "Check which filters you want to use to clean your MS data.",
+                    shiny::br(),
+                    shiny::h5("Deltas"),
+                    "Indicates the acceptable retention time and mass differences to consider that peaks are related.",
+                    shiny::br(),
+                    shiny::h5("Clusterisation options"),
+                    "You can choose to use the Pearson correlation between peaks as a supplementary data used
+                    during clusterisation",
+                    shiny::br(),
+                    shiny::h5("(Optional) Reference files"),
+                    "Optionally, you can use your own files for adducts and neutral losses.
+                    See the documentation for more information."
                 ),
 
                 shiny::mainPanel(
+                    warning_wd(),
                     shiny::fluidRow(
                         #                   filter_blk = TRUE,
                         #                   filter_mz = TRUE,
@@ -144,42 +210,26 @@ runGUI <- function() {
                     ),
                     shiny::hr(),
 
-                    # TODO
-                    shiny::helpText("You can optionally import personal reference files for adducts and neutral losses.",
-                                    "By default, data displayed in the Datasets tab will be used."),
-                    shiny::fluidRow(
-                        #                   user_pos_adducts_refs = NA,
-                        shiny::column(6,
-                            shiny::fileInput("user_pos_adducts_refs",
-                                             "(OPTIONAL) Upload a reference file for adducts in positive mode.",
-                                             width = "100%")
-                        ),
-                        #                   user_neg_adducts_refs = NA,
-                        shiny::column(6,
-                            shiny::fileInput("user_neg_adducts_refs",
-                                             "(OPTIONAL) Upload a reference file for adducts in negative mode.",
-                                             width = "100%")
-                        )
-                    ),
-                    shiny::fluidRow(
-                        #                   user_pos_neutral_refs = NA,
-                        shiny::column(6,
-                            shiny::fileInput("user_pos_neutral_refs",
-                                             "(OPTIONAL) Upload a reference file for neutral losses in positive mode.",
-                                             width = "100%")
-                        ),
-                        #                   user_neg_neutral_refs = NA,
-                        shiny::column(6,
-                            shiny::fileInput("user_neg_neutral_refs",
-                                             "(OPTIONAL) Upload a reference file for neutral losses in negative mode.",
-                                             width = "100%")
+                    "You can optionally import personal reference files for adducts and neutral losses.",
+                    "By default, data displayed in the Datasets tab will be used.",
+                    shiny::checkboxInput("user_refs",
+                                         "Use personal reference files?",
+                                         value = FALSE),
+                    shiny::conditionalPanel(
+                        condition = "input.user_refs",
+                        shiny::tabsetPanel(
+                            #                   user_pos_adducts_refs = NA,
+                            referenceInput("user_pos_adducts_refs", "Positive adducts"),
+                            #                   user_neg_adducts_refs = NA,
+                            referenceInput("user_neg_adducts_refs", "Negative adducts"),
+                            #                   user_pos_neutral_refs = NA,
+                            referenceInput("user_pos_neutral_refs", "Neutral losses in positive mode"),
+                            #                   user_neg_neutral_refs = NA,
+                            referenceInput("user_neg_neutral_refs", "Neutral losses in negative mode")
                         )
                     ),
 
-                    shiny::actionButton("button_clean",
-                                        "Clean MS-DIAL data",
-                                        width = "100%",
-                                        class = "btn btn-primary"),
+                    mainButton("button_clean", "Clean MS-DIAL data"),
                     shiny::verbatimTextOutput("clean")
                 )
             ),
@@ -194,6 +244,7 @@ runGUI <- function() {
                 ),
 
                 shiny::mainPanel(
+                    warning_wd(),
                     shiny::fluidRow(
                         #                selection_criterion = "degree",
                         shiny::column(4,
@@ -217,10 +268,7 @@ runGUI <- function() {
                         )
                     ),
 
-                    shiny::actionButton("button_keep",
-                                        "Keep top peaks by cluster",
-                                        width = "100%",
-                                        class = "btn btn-primary"),
+                    mainButton("button_keep", "Keep top peaks by cluster"),
                     shiny::verbatimTextOutput("keep")
                 )
             ),
@@ -235,27 +283,22 @@ runGUI <- function() {
                 ),
 
                 shiny::mainPanel(
+                    warning_wd(),
                     # TODO
                     # compound_levels = c("1a", "1b"),
-                    shiny::textInput("compound_levels",
-                                     "Indicate the compound levels in your annotation files, separated by commas (leave blank if none).",
-                                     placeholder = "direct,extension,...",
-                                     width = "90%"),
+                    levelsInput("compound_levels",
+                                "compound levels in your annotation files",
+                                "direct,extension,..."),
                     # biosoc_levels = c("genre", "family"),
-                    shiny::textInput("biosoc_levels",
-                                     "Indicate the biosource levels in your annotation process, separated by commas (leave blank if none).",
-                                     placeholder = "genus,family,...",
-                                     width = "90%"),
+                    levelsInput("biosoc_levels",
+                                "biosource levels in your annotation process",
+                                "genus,family,..."),
                     # levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
-                    shiny::textInput("levels_scores",
-                                     "Indicate the scores multipliers associated to your compound or biosource levels, separated by commas (leave blank if none).",
-                                     placeholder = "direct:2,genus:2,family:1.5,...",
-                                     width = "90%"),
+                    levelsInput("levels_scores",
+                                "scores multipliers associated to your compound or biosource levels",
+                                "direct:2,genus:2,family:1.5,..."),
 
-                    shiny::actionButton("button_launch",
-                                        "Launch MS-FINDER annotation",
-                                        width = "100%",
-                                        class = "btn btn-primary"),
+                    mainButton("button_launch", "Launch MS-FINDER annotation"),
                     shiny::verbatimTextOutput("launch")
                 )
             ),
@@ -270,15 +313,13 @@ runGUI <- function() {
                 ),
 
                 shiny::mainPanel(
+                    warning_wd(),
                     shiny::numericInput("min_score",
                                         "Minimum score to convert peak to MSP",
                                         value = 10,
                                         min = 0),
 
-                    shiny::actionButton("button_convert",
-                                        "Convert peaks to MSP files",
-                                        width = "100%",
-                                        class = "btn btn-primary"),
+                    mainButton("button_convert", "Convert peaks to MSP files"),
                     shiny::verbatimTextOutput("convert")
                 )
             ),
@@ -308,18 +349,91 @@ runGUI <- function() {
 
 
     server <- function(input, output, session) {
-        output$clean <- shiny::renderPrint({})
+        # Project directory
+        shinyjs::disable("button_clean")
+        shinyjs::disable("button_keep")
+        shinyjs::disable("button_launch")
+        shinyjs::disable("button_convert")
+
+        shiny::observeEvent(input$project_directory, {
+            shiny::req(input$project_directory > 0)  # condition prevents handler execution on initial app launch
+            default <- ifelse(exists("analysis_directory", envir = mscleanrCache),
+                              get("analysis_directory", envir = mscleanrCache),
+                              "~")
+            path <- shinyDirectoryInput::choose.dir(default = default)
+            assign("analysis_directory", path, envir = mscleanrCache)
+            shinyDirectoryInput::updateDirectoryInput(session, "project_directory", value = path)
+            shinyjs::enable("button_clean")
+            shinyjs::enable("button_keep")
+            shinyjs::enable("button_launch")
+            shinyjs::enable("button_convert")
+        })
+
+        shiny::observeEvent(input$overwrite, { assign("overwrite", input$overwrite, envir = mscleanrCache) })
+
+
+        # References
+        user_ref_generic <- function(ref_file) {
+            shiny::req(ref_file)
+            ext <- tools::file_ext(ref_file$filename)
+            data <- vroom::vroom(ref_file$datapath)
+            shiny::validate(shiny::need(ncol(data) == 2, "Please upload a reference file with 2 columns (see documentation)."))
+            return(data)
+        }
+        user_pos_adducts_refs <- shiny::reactive(user_ref_generic(input$user_pos_adducts_refs))
+        user_neg_adducts_refs <- shiny::reactive(user_ref_generic(input$user_neg_adducts_refs))
+        user_pos_neutral_refs <- shiny::reactive(user_ref_generic(input$user_pos_neutral_refs))
+        user_neg_neutral_refs <- shiny::reactive(user_ref_generic(input$user_neg_neutral_refs))
+
+        preview_ref <- function(ref_data) {
+            rbind(utils::head(ref_data, 2), stats::setNames(data.frame(a = "...", b = "..."), names(ref_data)))
+        }
+        output$user_pos_adducts_refs <- shiny::renderTable(preview_ref(user_pos_adducts_refs()))
+        output$user_neg_adducts_refs <- shiny::renderTable(preview_ref(user_neg_adducts_refs()))
+        output$user_pos_neutral_refs <- shiny::renderTable(preview_ref(user_pos_neutral_refs()))
+        output$user_neg_neutral_refs <- shiny::renderTable(preview_ref(user_neg_neutral_refs()))
+
+        # Datasets
+        output$adducts_pos <- shiny::renderDataTable(mass_adducts_pos,      escape = FALSE, options = list(pageLength = 10))
+        output$adducts_neg <- shiny::renderDataTable(mass_adducts_neg,      escape = FALSE, options = list(pageLength = 10))
+        output$nn_pos      <- shiny::renderDataTable(mass_neutral_loss_pos, escape = FALSE, options = list(pageLength = 10))
+        output$nn_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
+        output$isotopes    <- shiny::renderDataTable(mass_isotopes,         escape = FALSE, options = list(pageLength = 10))
+
+        # Functions output
+        shiny::observeEvent(input$button_clean, {
+            # TODO gérer références persos
+            output$clean <- shiny::renderPrint({
+                id <- shiny::showNotification(shiny::h1("Cleaning data..."), duration = NULL, closeButton = FALSE)
+                clean_msdial_data(filter_blk = "filter_blk" %in% input$filters,
+                                  filter_blk_threshold = input$filter_blk_threshold,
+                                  filter_mz = "filter_mz" %in% input$filters,
+                                  filter_rsd = "filter_rsd" %in% input$filters,
+                                  filter_rsd_threshold = input$filter_rsd_threshold,
+                                  threshold_mz = input$threshold_mz,
+                                  threshold_rt = input$threshold_rt,
+                                  # user_pos_adducts_refs =
+                                  # user_neg_adducts_refs =
+                                  # user_pos_neutral_refs =
+                                  # user_neg_neutral_refs =
+                                  compute_pearson_correlation = input$compute_pearson_correlation,
+                                  pearson_correlation_threshold = input$pearson_correlation_threshold,
+                                  pearson_p_value = input$pearson_p_value)
+                shiny::removeNotification(id)
+            })
+        })
+
         output$keep <- shiny::renderPrint({})
         output$launch <- shiny::renderPrint({})
         output$convert <- shiny::renderPrint({})
 
-        # Datasets
-        output$adducts_pos <- shiny::renderDataTable(mass_adducts_pos, escape = FALSE, options = list(pageLength = 10))
-        output$adducts_neg <- shiny::renderDataTable(mass_adducts_neg, escape = FALSE, options = list(pageLength = 10))
-        output$nn_pos      <- shiny::renderDataTable(mass_neutral_loss_pos, escape = FALSE, options = list(pageLength = 10))
-        output$nn_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
-        output$isotopes    <- shiny::renderDataTable(mass_isotopes, escape = FALSE, options = list(pageLength = 10))
+
+        shiny::onStop(function() { assign("shiny_running", FALSE, envir = mscleanrCache) })
     }
 
-    shiny::runApp(shiny::shinyApp(ui, server))
+
+
+    shiny::runApp(shiny::shinyApp(ui = ui,
+                                  server = server,
+                                  onStart = function() { assign("shiny_running", TRUE, envir = mscleanrCache) }))
 }

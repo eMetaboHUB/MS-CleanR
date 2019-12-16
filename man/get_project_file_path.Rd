@@ -5,7 +5,6 @@
 \title{Get path for a project file or directory.}
 \usage{
 get_project_file_path(
-  project_directory,
   filetype,
   source = NA,
   msfinder_info = NA,
@@ -14,8 +13,6 @@ get_project_file_path(
 )
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{filetype}{A string indicating the needed directory or file.}
 
 \item{source}{A string indicating which mode to read from: "pos" or "neg".}

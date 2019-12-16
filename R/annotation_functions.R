@@ -48,7 +48,7 @@ annotate_cluster <- function(identifying_data, cluster_id, couple_ids = NULL, co
         identifying_data[in_cluster,]$annotation_result <- id_type
 
         if (length(most_probable) > 1) {
-            identifying_data[in_cluster,]$annotation_warning <- paste0("Manual check recommanded : several final ",
+            identifying_data[in_cluster,]$annotation_warning <- paste0("Manual check recommended : several final ",
                                                                        id_type,
                                                                        " possibilities, the first one was selected.")
             most_probable <- c(most_probable[1])

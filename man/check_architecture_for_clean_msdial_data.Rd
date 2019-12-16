@@ -4,12 +4,7 @@
 \alias{check_architecture_for_clean_msdial_data}
 \title{Check project architecture before running \code{\link{clean_msdial_data}}.}
 \usage{
-check_architecture_for_clean_msdial_data(project_directory, overwrite = FALSE)
-}
-\arguments{
-\item{project_directory}{The path of the project directory.}
-
-\item{overwrite}{A boolean indicating whether to stop the script if there is an existing analysis or overwrite it.}
+check_architecture_for_clean_msdial_data()
 }
 \description{
 Check project architecture before running \code{\link{clean_msdial_data}}.

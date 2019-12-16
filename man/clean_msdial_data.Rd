@@ -5,7 +5,6 @@
 \title{Combine pos and neg files from MSDial and filter peaks according to user parameters}
 \usage{
 clean_msdial_data(
-  project_directory,
   filter_blk = TRUE,
   filter_blk_threshold = 0.8,
   filter_mz = TRUE,
@@ -19,13 +18,10 @@ clean_msdial_data(
   user_neg_neutral_refs = NA,
   compute_pearson_correlation = FALSE,
   pearson_correlation_threshold = 0.8,
-  pearson_p_value = 0.05,
-  overwrite = FALSE
+  pearson_p_value = 0.05
 )
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{filter_blk}{A boolean indicating whether or not to delete rows with too much noise.}
 
 \item{filter_blk_threshold}{A numerical threshold for noise filtering: rows with ratio mean(blank columns)/mean(qc columns) >= \code{filter_blk} are deleted (if there are no QC columns in the sample, the mean of standard columns is used, or the mean of all non-blank samples if needed).}
@@ -47,13 +43,11 @@ clean_msdial_data(
 \item{pearson_correlation_threshold}{Ignore links having a Pearson correlation < threshold (default: 0.8).}
 
 \item{pearson_p_value}{Ignore links having a non-significative Pearson correlation (default: 0.05).}
-
-\item{overwrite}{A boolean indicating whether to stop the script if there is an existing analysis or overwrite it.}
 }
 \description{
 Combine pos and neg files from MSDial and filter peaks according to user parameters
 }
-\section{Architecture needed by clean_msdial_data in \code{<project_directory>}}{
+\section{Architecture needed by clean_msdial_data in the project directory}{
 
 \itemize{
   \item pos
@@ -69,7 +63,7 @@ Combine pos and neg files from MSDial and filter peaks according to user paramet
 }
 }
 
-\section{Output files of clean_msdial_data in \code{<project_directory>}}{
+\section{Output files of clean_msdial_data in the project directory}{
 
 \itemize{
   \item pos

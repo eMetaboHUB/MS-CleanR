@@ -1,10 +1,10 @@
 
 #' Annotates peaks based on files extracted from MSFinder.
 #'
-#' @eval recurrent_params("project_directory", "compound_levels", "biosoc_levels", "overwrite")
+#' @eval recurrent_params("compound_levels", "biosoc_levels")
 #' @param levels_scores A list of levels names and their corresponding multiplier to adapt final annotation scores.
 #'
-#' @section Architecture needed by launch_msfinder_annotation in \code{<project_directory>}:
+#' @section Architecture needed by launch_msfinder_annotation in the project_directory:
 #' \itemize{
 #'   \item pos
 #'   \itemize{
@@ -30,7 +30,7 @@
 #'   }
 #' }
 #'
-#' @section Output files of launch_msfinder_annotation in \code{<project_directory>}:
+#' @section Output files of launch_msfinder_annotation in the project directory:
 #' \describe{
 #'   \item{annotated_data-cleaned.csv}{Final auto-annotated data with only relevant peaks}
 #' }
@@ -44,21 +44,17 @@
 #' }
 #'
 #' @export
-launch_msfinder_annotation <- function(project_directory,
-                                       compound_levels = NULL,  # c() = NULL
+launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
                                        biosoc_levels = c("generic"),
-                                       levels_scores = NULL,
-                                       overwrite = FALSE) {
+                                       levels_scores = NULL) {
 
-    check_input_parameters_launch_msfinder(biosoc_levels, compound_levels, levels_scores, overwrite)
-    check_architecture_for_launch_msfinder_annotation(project_directory,
-                                                      msfinder_biosoc_levels = biosoc_levels,
-                                                      overwrite = overwrite)
+    check_input_parameters_launch_msfinder(biosoc_levels, compound_levels, levels_scores)
+    check_architecture_for_launch_msfinder_annotation(biosoc_levels)
 
-    print_message("*** Treating ", project_directory, " ***")
-    samples     <- import_data(project_directory, "samples")
-    final_data  <- import_data(project_directory, "final_peaks_data")
-    final_links <- import_data(project_directory, "links_ms_final")
+    print_message("*** Treating ", get("project_directory", envir = mscleanrCache), " ***")
+    samples     <- import_data("samples")
+    final_data  <- import_data("final_peaks_data")
+    final_links <- import_data("links_ms_final")
 
     # Samples check
     for(s in samples$Column_name) {
@@ -70,7 +66,7 @@ launch_msfinder_annotation <- function(project_directory,
     for(source in c("pos", "neg")) {
         for(level in c(biosoc_levels, "generic")) {
             suppressWarnings(
-                msf_tmp <- import_msfinder_data(project_directory, source, level)
+                msf_tmp <- import_msfinder_data(source, level)
             )
             # Dealing with potentially missing columns
             if (!is.null(msf_tmp) & length(names(msfinder_data)) > 0) {
@@ -87,7 +83,9 @@ launch_msfinder_annotation <- function(project_directory,
         }
     }
 
-    if(nrow(msfinder_data) == 0) stop_script("No usable MSFinder data found in ", project_directory, ".")
+    if(nrow(msfinder_data) == 0) stop_script("No usable MSFinder data found in ",
+                                             get("project_directory", envir = mscleanrCache),
+                                             ".")
 
     # Deleting duplicates present in several levels
     msfinder_data <- msfinder_data %>% dplyr::distinct(.data$id,
@@ -111,7 +109,7 @@ launch_msfinder_annotation <- function(project_directory,
     biosoc_levels <- biosoc_levels[biosoc_levels != "generic"]
     identifying_data$level <- ordered(identifying_data$level, levels = c(biosoc_levels, "generic"))
     identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, level, -xtfrm(Total.score))),]
-    export_data(identifying_data, project_directory, "identifying_data")
+    export_data(identifying_data, "identifying_data")
 
 
     # AUTOMATIC ANNOTATION
@@ -189,7 +187,6 @@ launch_msfinder_annotation <- function(project_directory,
     identifying_data$Final.score <- as.numeric(identifying_data$Total.score)
     for (level in names(levels_scores)) identifying_data <- update_annotations_scores(identifying_data, level, levels_scores[[level]])
 
-    # msf_main_cols <- replace(msf_main_cols, length(msf_main_cols), "Final.score")  # replacing Total.score by Final.score
     msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
     identifying_data <- identifying_data[, c(c("annotation_result", "annotation", "annotation_warning"),
                                              msd_main_cols[msd_main_cols != "MS.MS.spectrum"],
@@ -198,24 +195,21 @@ launch_msfinder_annotation <- function(project_directory,
                                              samples$Column_name,
                                              "MS.MS.spectrum"),]
     identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Final.score))),]
-    export_data(identifying_data, project_directory, "annotated_data", empty_na = TRUE)
+    export_data(identifying_data, "annotated_data", empty_na = TRUE)
 
 
     # Exporting final annotations
-    final_annotations <- identifying_data[which(identifying_data$annotation),]
-
-    export_data(final_annotations[!names(final_annotations) %in% c("annotation", "id", "rank.formula",
-                                                                   "rank.structure", "cluster", "cluster.size")],
-                project_directory,
-                "annotated_data-cleaned",
-                empty_na = TRUE)
-
-    if(nrow(final_annotations[!is.na(final_annotations$annotation_warning),]) > 0) {
-        export_data(final_annotations[!is.na(final_annotations$annotation_warning),],
-                    project_directory,
+    if(nrow(identifying_data[!is.na(identifying_data$annotation_warning),]) > 0) {
+        export_data(identifying_data[!is.na(identifying_data$annotation_warning),],
                     "annotated_data-manual_check",
                     empty_na = TRUE)
     }
+
+    final_annotations <- identifying_data[which(identifying_data$annotation),]
+    export_data(final_annotations[!names(final_annotations) %in% c("annotation", "id", "rank.formula",
+                                                                   "rank.structure", "cluster", "cluster.size")],
+                "annotated_data-cleaned",
+                empty_na = TRUE)
 
 
     # Normalization of remaining peaks
@@ -226,7 +220,6 @@ launch_msfinder_annotation <- function(project_directory,
 
     export_data(final_annotations[!names(final_annotations) %in% c("annotation", "id", "rank.formula",
                                                                    "rank.structure", "cluster", "cluster.size")],
-                project_directory,
                 "annotated_data-normalized",
                 empty_na = TRUE)
 

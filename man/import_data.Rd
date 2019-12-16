@@ -4,11 +4,9 @@
 \alias{import_data}
 \title{Import data exported by the script.}
 \usage{
-import_data(project_directory, filetype, ...)
+import_data(filetype, ...)
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{filetype}{A string indicating the needed directory or file.}
 
 \item{...}{Additional parameters passed on to \code{\link{get_project_file_path}}.}

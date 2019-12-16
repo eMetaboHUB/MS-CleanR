@@ -5,17 +5,11 @@
 \title{Check project architecture before running \code{\link{launch_msfinder_annotation}}.}
 \usage{
 check_architecture_for_launch_msfinder_annotation(
-  project_directory,
-  msfinder_biosoc_levels = NULL,
-  overwrite = FALSE
+  msfinder_biosoc_levels = NULL
 )
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{msfinder_biosoc_levels}{MSFinder annotation biosource levels to check (only used when \code{launch_msfinder_annotation = TRUE}).}
-
-\item{overwrite}{A boolean indicating whether to stop the script if there is an existing analysis or overwrite it.}
 }
 \description{
 Check project architecture before running \code{\link{launch_msfinder_annotation}}.

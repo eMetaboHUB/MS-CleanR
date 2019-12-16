@@ -4,11 +4,9 @@
 \alias{export_params}
 \title{Export parameters used for the current run.}
 \usage{
-export_params(project_directory, ...)
+export_params(...)
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{...}{Parameters used for the current run of the script.}
 }
 \description{

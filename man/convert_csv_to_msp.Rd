@@ -4,11 +4,9 @@
 \alias{convert_csv_to_msp}
 \title{Convert the final CSV file post annotations to MSP format.}
 \usage{
-convert_csv_to_msp(project_directory, min_score = 20)
+convert_csv_to_msp(min_score = 20)
 }
 \arguments{
-\item{project_directory}{The path of the project directory.}
-
 \item{min_score}{Peaks must have a final score >= \code{min_score} to be exported to the msp file.}
 }
 \description{

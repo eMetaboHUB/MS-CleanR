@@ -91,14 +91,20 @@ substrRight <- function(x, n = 1) substr(x, nchar(x)-n+1, nchar(x))
 #' Print a message in green.
 #'
 #' @param ... Strings to print.
-print_message <- function(...) message(crayon::green(paste0(...)))
+print_message <- function(...) {
+    if (get("shiny_running", envir = mscleanrCache)) print(crayon::green(paste0(...)))
+    else                                             message(crayon::green(paste0(...)))
+}
 
 
 
 #' Print a warning in yellow.
 #'
 #' @param ... Strings to print.
-print_warning <- function(...) message(crayon::yellow(paste0(...)))
+print_warning <- function(...) {
+    if (get("shiny_running", envir = mscleanrCache)) print(crayon::yellow(paste0(...)))
+    else                                             message(crayon::yellow(paste0(...)))
+}
 
 
 
@@ -120,6 +126,8 @@ stop_script <- function(..., generic_msg = TRUE) {
 get_confirmation_for_overwriting <- function(path) {
     user_choice <- readline(print_warning(path, " already exists.\n",
                                           "Do you want to overwrite it? [y/n]\n",
-                                          "Set overwrite = TRUE to automatically overwrite the existing analysis."))
+                                          "Set 'overwrite = TRUE' to automatically overwrite the existing analysis."))
     return(tolower(user_choice) == "y")
 }
+
+
