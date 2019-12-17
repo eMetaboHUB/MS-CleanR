@@ -74,7 +74,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
 
     check_architecture_for_clean_msdial_data()
 
-    print_message("*** Treating ", get("project_directory", envir = mscleanrCache), " ***")
+    print_message("*** Treating ", get("analysis_directory", envir = mscleanrCache), " ***")
 
     export_params(filter_blk                  = filter_blk,
                   filter_blk_threshold        = filter_blk_threshold,

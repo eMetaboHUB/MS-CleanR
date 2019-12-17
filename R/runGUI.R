@@ -39,7 +39,7 @@ runGUI <- function() {
                          width = "90%")
     }
 
-    mainButton <- function(id, label) shiny::actionButton(id, label,  width = "100%", class = "btn btn-primary")
+    mainButton <- function(id, label) shiny::actionButton(id, label,  width = "100%", class = "btn btn-success")
 
     warning_wd <- function() {
         shiny::conditionalPanel(
@@ -52,22 +52,17 @@ runGUI <- function() {
         )
     }
 
+    fun_waiter <- function(h1) {
+        waiter::Waiter$new(html = shiny::div(shiny::h1(h1, style = "color: white"),
+                                             waiter::spin_double_bounce()),
+                           color = "#4CAF50")
+    }
+
 
 
     ui <- shiny::tagList(
         shinyjs::useShinyjs(),
         waiter::use_waiter(),
-
-        tags$head(
-            tags$style(
-                HTML(".shiny-notification {
-                     position:fixed;
-                     top: calc(50%);
-                     left: calc(50%);
-                     }"
-                )
-            )
-        ),
 
         shiny::navbarPage(
             theme = shinythemes::shinytheme("paper"),
@@ -250,12 +245,15 @@ runGUI <- function() {
                         shiny::column(4,
                             shiny::checkboxGroupInput("selection_criteria",
                                                       "Selection criteria",
-                                                      c("Degree (most connected peaks)", "Intensity (most intense peaks)"))
+                                                      choiceNames = c("Intensity (most intense peaks)",
+                                                                      "Degree (most connected peaks)"),
+                                                      choiceValues = c("intensity", "degree"),
+                                                      selected = "intensity")
                         ),
                         #                n = 1,
                         shiny::column(4,
                             shiny::numericInput("n",
-                                                "Number of peaks to keep (by cluster)",
+                                                "Number of peaks to keep (by cluster and by method)",
                                                 value = 1,
                                                 min = 1,
                                                 step = 1)
@@ -284,7 +282,6 @@ runGUI <- function() {
 
                 shiny::mainPanel(
                     warning_wd(),
-                    # TODO
                     # compound_levels = c("1a", "1b"),
                     levelsInput("compound_levels",
                                 "compound levels in your annotation files",
@@ -400,32 +397,113 @@ runGUI <- function() {
         output$nn_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
         output$isotopes    <- shiny::renderDataTable(mass_isotopes,         escape = FALSE, options = list(pageLength = 10))
 
-        # Functions output
-        shiny::observeEvent(input$button_clean, {
-            # TODO gérer références persos
-            output$clean <- shiny::renderPrint({
-                id <- shiny::showNotification(shiny::h1("Cleaning data..."), duration = NULL, closeButton = FALSE)
-                clean_msdial_data(filter_blk = "filter_blk" %in% input$filters,
-                                  filter_blk_threshold = input$filter_blk_threshold,
-                                  filter_mz = "filter_mz" %in% input$filters,
-                                  filter_rsd = "filter_rsd" %in% input$filters,
-                                  filter_rsd_threshold = input$filter_rsd_threshold,
-                                  threshold_mz = input$threshold_mz,
-                                  threshold_rt = input$threshold_rt,
-                                  # user_pos_adducts_refs =
-                                  # user_neg_adducts_refs =
-                                  # user_pos_neutral_refs =
-                                  # user_neg_neutral_refs =
-                                  compute_pearson_correlation = input$compute_pearson_correlation,
-                                  pearson_correlation_threshold = input$pearson_correlation_threshold,
-                                  pearson_p_value = input$pearson_p_value)
-                shiny::removeNotification(id)
-            })
+
+        # clean_msdial_data
+        # TODO gérer références persos
+        clean_params <- shiny::eventReactive(input$button_clean, {
+            list(filter_blk                    = "filter_blk" %in% input$filters,
+                 filter_blk_threshold          = input$filter_blk_threshold,
+                 filter_mz                     = "filter_mz" %in% input$filters,
+                 filter_rsd                    = "filter_rsd" %in% input$filters,
+                 filter_rsd_threshold          = input$filter_rsd_threshold,
+                 threshold_mz                  = input$threshold_mz,
+                 threshold_rt                  = input$threshold_rt,
+                 compute_pearson_correlation   = input$compute_pearson_correlation,
+                 pearson_correlation_threshold = input$pearson_correlation_threshold,
+                 pearson_p_value               = input$pearson_p_value)
         })
 
-        output$keep <- shiny::renderPrint({})
-        output$launch <- shiny::renderPrint({})
-        output$convert <- shiny::renderPrint({})
+        output$clean <- shiny::renderPrint({
+            shiny::req(input$button_clean > 0)
+            shiny::req(exists("analysis_directory", envir = mscleanrCache))
+            shiny::req(clean_params())
+            waiter <- fun_waiter("Cleaning data...")
+            waiter$show()
+            tryCatch(
+                do.call(clean_msdial_data, clean_params()),
+                finally = waiter$hide()
+            )
+        })
+
+
+        # keep_top_peaks
+        keep_params <- shiny::eventReactive(input$button_keep, {
+            shiny::req("degree" %in% input$selection_criteria | "intensity" %in% input$selection_criteria)
+            if ("degree" %in% input$selection_criteria) {
+                if ("intensity" %in% input$selection_criteria) mode <- "both"
+                else                                           mode <- "degree"
+            } else                                             mode <- "intensity"
+            list(selection_criterion   = mode,
+                 n                     = input$n,
+                 export_filtered_peaks = input$export_filtered_peaks)
+        })
+
+        output$keep <- shiny::renderPrint({
+            shiny::req(input$button_keep > 0)
+            shiny::req(exists("analysis_directory", envir = mscleanrCache))
+            shiny::req(keep_params())
+            waiter <- fun_waiter("Keeping only selected peaks...")
+            waiter$show()
+            tryCatch(
+                do.call(keep_top_peaks, keep_params()),
+                finally = waiter$hide()
+            )
+        })
+
+
+        # launch_msfinder_annotation
+        launch_params <- shiny::eventReactive(input$button_launch, {
+            clean <- function(l) {
+                tmp <- unlist(lapply(strsplit(l, ",", fixed = TRUE), function(x) trimws(x)))
+                tmp <- tmp[tmp != ""]
+                if (length(tmp) == 0) return(NULL)
+                else                  return(tmp)
+            }
+
+            cpmd <- clean(input$compound_levels)
+
+            biosoc <- clean(input$biosoc_levels)
+            if (is.null(biosoc)) biosoc <- c("generic")
+
+            tmp_scores <- lapply(clean(input$levels_scores), strsplit, split = ":", fixed = TRUE)
+            if (length(tmp_scores) == 0) scores <- NULL
+            else {
+                scores <- list()
+                for (x in tmp_scores) scores[x[[1]][1]] <- ifelse(is.na(x[[1]][2]) | x[[1]][2] == "", 1, x[[1]][2])
+            }
+
+            list(compound_levels = cpmd,
+                 biosoc_levels   = biosoc,
+                 levels_scores   = scores)
+        })
+
+        output$launch <- shiny::renderPrint({
+            shiny::req(input$button_launch > 0)
+            shiny::req(exists("analysis_directory", envir = mscleanrCache))
+            shiny::req(launch_params())
+            waiter <- fun_waiter("Annotating peaks with MS-FINDER data...")
+            waiter$show()
+            tryCatch(
+                do.call(launch_msfinder_annotation, launch_params()),
+                finally = waiter$hide()
+            )
+        })
+
+
+        # convert_csv_to_msp
+        convert_params <- shiny::eventReactive(input$button_convert, list(min_score = input$min_score))
+
+        output$convert <- shiny::renderPrint({
+            shiny::req(input$button_convert > 0)
+            shiny::req(exists("analysis_directory", envir = mscleanrCache))
+            shiny::req(convert_params())
+            waiter <- fun_waiter("Converting peaks to MSP...")
+            waiter$show()
+            tryCatch(
+                do.call(convert_csv_to_msp, convert_params()),
+                finally = waiter$hide()
+            )
+        })
 
 
         shiny::onStop(function() { assign("shiny_running", FALSE, envir = mscleanrCache) })

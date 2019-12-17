@@ -51,7 +51,7 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     check_input_parameters_launch_msfinder(biosoc_levels, compound_levels, levels_scores)
     check_architecture_for_launch_msfinder_annotation(biosoc_levels)
 
-    print_message("*** Treating ", get("project_directory", envir = mscleanrCache), " ***")
+    print_message("*** Treating ", get("analysis_directory", envir = mscleanrCache), " ***")
     samples     <- import_data("samples")
     final_data  <- import_data("final_peaks_data")
     final_links <- import_data("links_ms_final")
@@ -84,7 +84,7 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     }
 
     if(nrow(msfinder_data) == 0) stop_script("No usable MSFinder data found in ",
-                                             get("project_directory", envir = mscleanrCache),
+                                             get("analysis_directory", envir = mscleanrCache),
                                              ".")
 
     # Deleting duplicates present in several levels
