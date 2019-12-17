@@ -16,6 +16,8 @@ keep_top_peaks <- function(selection_criterion,
     check_input_parameters_keep_top_peaks(selection_criterion, n, export_filtered_peaks)
     check_architecture_for_keep_top_peaks(export_filtered_peaks)
 
+    print_message("Filtering on ", selection_criterion, " (", n, " peaks by cluster and by method)")
+
     samples             <- import_data("samples")
     final_data          <- import_data("clusters_final")
     final_peaks_adducts <- import_data("final_adducts_data")
@@ -43,7 +45,7 @@ keep_top_peaks <- function(selection_criterion,
          if (selection_criterion == "intensity") final_data <- final_data_intensity
     else if (selection_criterion == "degree")    final_data <- final_data_degree
     else if (selection_criterion == "both")      final_data <- unique(rbind(final_data_intensity, final_data_degree))
-    print_peaks_status(final_data, "MSDial peaks after peaks filtering:")
+    print_peaks_status(final_data, "MSDial peaks after peaks filtering: ")
 
     final_data$cluster.msdial <- NULL
     final_data$cluster.msdial.size <- NULL
