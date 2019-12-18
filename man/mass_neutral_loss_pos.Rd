@@ -15,4 +15,7 @@ mass_neutral_loss_pos
 \description{
 Masses of neutral losses, in positive mode.
 }
+\seealso{
+\code{\link{mass_adducts_neg}}, \code{\link{mass_adducts_pos}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_isotopes}}
+}
 \keyword{datasets}

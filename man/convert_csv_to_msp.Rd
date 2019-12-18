@@ -7,7 +7,7 @@
 convert_csv_to_msp(min_score = 20)
 }
 \arguments{
-\item{min_score}{Peaks must have a final score >= \code{min_score} to be exported to the msp file.}
+\item{min_score}{Peaks must have a final score >= \code{min_score} to be exported to the MSP files.}
 }
 \description{
 Convert the final CSV file post annotations to MSP format.

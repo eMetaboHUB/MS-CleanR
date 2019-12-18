@@ -1,7 +1,7 @@
 
 #' Filter peaks based on a given criterion.
 #'
-#' Keeps \code{n} peaks by cluster.
+#' Keeps \code{n} peaks by cluster and by method.
 #' If there are ties, more than \code{n} peaks can be selected ( see \code{\link[dplyr]{top_n}} for more information).
 #'
 #' @param selection_criterion "intensity" or "degree" or "both".

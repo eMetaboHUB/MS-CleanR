@@ -32,25 +32,36 @@ runGUI <- function() {
         )
     }
 
-    levelsInput <- function(id, label, placeholder) {
-        shiny::textInput(id,
-                         paste0("Indicate the ", label,", separated by commas (leave blank if none)."),
-                         placeholder = placeholder,
-                         width = "90%")
+    levelsInput <- function(id, label, placeholder, blank_if_none = TRUE) {
+        shiny::fluidRow(
+            shiny::column(8,
+                shiny::textInput(id,
+                                 paste0("Indicate the ",
+                                        label,
+                                        ", separated by commas",
+                                        ifelse(blank_if_none, " (leave blank if none).", ".")),
+                                 placeholder = placeholder,
+                                 width = "90%")
+            ),
+            shiny::column(4, shiny::tableOutput(id))
+        )
     }
 
     mainButton <- function(id, label) shiny::actionButton(id, label,  width = "100%", class = "btn btn-success")
 
-    warning_wd <- function() {
+    warning_perso <- function(condition, text) {
         shiny::conditionalPanel(
-            condition = "document.getElementById('button_clean').disabled",
+            condition = condition,
             shiny::div(class = "panel panel-warning",
                 shiny::div(class = "panel-heading",
-                    shiny::h3(class = "panel-title", "Please select the project directory.")
+                    shiny::h3(class = "panel-title", text)
                 )
             )
         )
     }
+
+    warning_wd <- function() warning_perso("document.getElementById('button_clean').disabled",
+                                           "Please select the project directory.")
 
     fun_waiter <- function(h1) {
         waiter::Waiter$new(html = shiny::div(shiny::h1(h1, style = "color: white"),
@@ -81,6 +92,7 @@ runGUI <- function() {
 
                 shiny::mainPanel(
                     warning_wd(),
+                    # TODO changer peut-être parce que pas stable
                     #                   project_directory,
                     shinyDirectoryInput::directoryInput("project_directory",
                                                         label = "Select the project directory"),
@@ -96,16 +108,15 @@ runGUI <- function() {
                 "Clean MS-DIAL data",
 
                 shiny::sidebarPanel(
+                    shiny::h6("Combine positive and negative files from MSDial and filter peaks according to user parameters."),
+                    shiny::br(),
                     shiny::h5("Filters"),
                     "Check which filters you want to use to clean your MS data.",
-                    shiny::br(),
                     shiny::h5("Deltas"),
                     "Indicates the acceptable retention time and mass differences to consider that peaks are related.",
-                    shiny::br(),
                     shiny::h5("Clusterisation options"),
                     "You can choose to use the Pearson correlation between peaks as a supplementary data used
                     during clusterisation",
-                    shiny::br(),
                     shiny::h5("(Optional) Reference files"),
                     "Optionally, you can use your own files for adducts and neutral losses.
                     See the documentation for more information."
@@ -234,12 +245,19 @@ runGUI <- function() {
                 "Keep top peaks by cluster",
 
                 shiny::sidebarPanel(
-                    shiny::h2("TODO"),
-                    "Help message."
+                    shiny::h6("Keeps only the top peaks by cluster and by method."),
+                    shiny::br(),
+                    shiny::h5("Selection mode"),
+                    "Peaks selected can be the most intense (intensity), most connected (degree), or both.",
+                    "If there are ties, the number of peaks selected can be greater than the number requested by the user.",
+                    shiny::h5("Exporting filtered peaks"),
+                    "Copy MAT files corresponding to the selected peaks in a new folder for an faster analysis in MS-FINDER."
                 ),
 
                 shiny::mainPanel(
                     warning_wd(),
+                    warning_perso("!(input.selection_criteria.includes('intensity') | input.selection_criteria.includes('degree'))",
+                                  "Please select at least one selection criterion."),
                     shiny::fluidRow(
                         #                selection_criterion = "degree",
                         shiny::column(4,
@@ -276,8 +294,16 @@ runGUI <- function() {
                 "Launch MS-FINDER annotation",
 
                 shiny::sidebarPanel(
-                    shiny::h2("TODO"),
-                    "Help message."
+                    shiny::h6("Annotates peaks based on files extracted from MSFinder."),
+                    shiny::br(),
+                    shiny::h5("Compound levels"),
+                    "The list of compound levels to consider, in the given order (from more important to least important).",
+                    shiny::h5("Biosource levels"),
+                    "The list of biosource levels to consider, in the given order (from more important to least important).",
+                    "They must correspond to the folders containing MS-FINDER files in your project directory.",
+                    "The level 'generic' is always added as the last biosource level considered.",
+                    shiny::h5("Levels scores"),
+                    "A list of levels names and their corresponding multiplier to adapt final annotation scores."
                 ),
 
                 shiny::mainPanel(
@@ -289,7 +315,8 @@ runGUI <- function() {
                     # biosoc_levels = c("genre", "family"),
                     levelsInput("biosoc_levels",
                                 "biosource levels in your annotation process",
-                                "genus,family,..."),
+                                "genus,family,...",
+                                blank_if_none = FALSE),
                     # levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
                     levelsInput("levels_scores",
                                 "scores multipliers associated to your compound or biosource levels",
@@ -305,8 +332,10 @@ runGUI <- function() {
                 "Convert annotated peaks to MSP files",
 
                 shiny::sidebarPanel(
-                    shiny::h2("TODO"),
-                    "Help message."
+                    shiny::h6("Convert the final CSV file post annotations to MSP format."),
+                    shiny::br(),
+                    shiny::h5("Minimum score"),
+                    "Minimum annotation score needed to export peaks to the MSP files."
                 ),
 
                 shiny::mainPanel(
@@ -326,8 +355,14 @@ runGUI <- function() {
                 "Datasets",
 
                 shiny::sidebarPanel(
-                    shiny::h2("TODO"),
-                    "Help message."
+                    shiny::h6("Datasets used by default during the analysis if none are provided by the user."),
+                    shiny::br(),
+                    shiny::h5("Adducts"),
+                    "Mass differences of adducts with the original compound M, in positive and negative mode.",
+                    shiny::h5("Neutral losses"),
+                    "Masses of neutral losses, in positive and negative mode.",
+                    shiny::h5("Isotopes"),
+                    "Masses of isotopes."
                 ),
 
                 shiny::mainPanel(
@@ -372,45 +407,50 @@ runGUI <- function() {
         # References
         user_ref_generic <- function(ref_file) {
             shiny::req(ref_file)
-            ext <- tools::file_ext(ref_file$filename)
             data <- vroom::vroom(ref_file$datapath)
             shiny::validate(shiny::need(ncol(data) == 2, "Please upload a reference file with 2 columns (see documentation)."))
             return(data)
         }
-        user_pos_adducts_refs <- shiny::reactive(user_ref_generic(input$user_pos_adducts_refs))
-        user_neg_adducts_refs <- shiny::reactive(user_ref_generic(input$user_neg_adducts_refs))
-        user_pos_neutral_refs <- shiny::reactive(user_ref_generic(input$user_pos_neutral_refs))
-        user_neg_neutral_refs <- shiny::reactive(user_ref_generic(input$user_neg_neutral_refs))
+        user_pos_adducts_refs <- shiny::reactive({ shiny::req(user_ref_generic(input$user_pos_adducts_refs))
+                                                   user_ref_generic(input$user_pos_adducts_refs) })
+        user_neg_adducts_refs <- shiny::reactive({ shiny::req(user_ref_generic(input$user_neg_adducts_refs))
+                                                   user_ref_generic(input$user_neg_adducts_refs) })
+        user_pos_neutral_refs <- shiny::reactive({ shiny::req(user_ref_generic(input$user_pos_neutral_refs))
+                                                   user_ref_generic(input$user_pos_neutral_refs) })
+        user_neg_neutral_refs <- shiny::reactive({ shiny::req(user_ref_generic(input$user_neg_neutral_refs))
+                                                   user_ref_generic(input$user_neg_neutral_refs) })
 
-        preview_ref <- function(ref_data) {
-            rbind(utils::head(ref_data, 2), stats::setNames(data.frame(a = "...", b = "..."), names(ref_data)))
-        }
+        preview_ref <- function(ref_data) rbind(utils::head(ref_data, 2),
+                                                stats::setNames(data.frame(a = "...", b = "..."), names(ref_data)))
         output$user_pos_adducts_refs <- shiny::renderTable(preview_ref(user_pos_adducts_refs()))
         output$user_neg_adducts_refs <- shiny::renderTable(preview_ref(user_neg_adducts_refs()))
         output$user_pos_neutral_refs <- shiny::renderTable(preview_ref(user_pos_neutral_refs()))
         output$user_neg_neutral_refs <- shiny::renderTable(preview_ref(user_neg_neutral_refs()))
 
-        # Datasets
-        output$adducts_pos <- shiny::renderDataTable(mass_adducts_pos,      escape = FALSE, options = list(pageLength = 10))
-        output$adducts_neg <- shiny::renderDataTable(mass_adducts_neg,      escape = FALSE, options = list(pageLength = 10))
-        output$nn_pos      <- shiny::renderDataTable(mass_neutral_loss_pos, escape = FALSE, options = list(pageLength = 10))
-        output$nn_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
-        output$isotopes    <- shiny::renderDataTable(mass_isotopes,         escape = FALSE, options = list(pageLength = 10))
-
 
         # clean_msdial_data
-        # TODO gérer références persos
         clean_params <- shiny::eventReactive(input$button_clean, {
-            list(filter_blk                    = "filter_blk" %in% input$filters,
-                 filter_blk_threshold          = input$filter_blk_threshold,
-                 filter_mz                     = "filter_mz" %in% input$filters,
-                 filter_rsd                    = "filter_rsd" %in% input$filters,
-                 filter_rsd_threshold          = input$filter_rsd_threshold,
-                 threshold_mz                  = input$threshold_mz,
-                 threshold_rt                  = input$threshold_rt,
-                 compute_pearson_correlation   = input$compute_pearson_correlation,
-                 pearson_correlation_threshold = input$pearson_correlation_threshold,
-                 pearson_p_value               = input$pearson_p_value)
+            check_ref <- function(ref) {
+                tryCatch({ shiny::validate(shiny::need(ref, "not found")) ; return(ref) },
+                         error = function(e) {})
+            }
+            get_ref   <- function(ref) if(is.null(check_ref(ref))) NA else as.data.frame(ref)
+            list(
+                filter_blk                    = "filter_blk" %in% input$filters,
+                filter_blk_threshold          = input$filter_blk_threshold,
+                filter_mz                     = "filter_mz" %in% input$filters,
+                filter_rsd                    = "filter_rsd" %in% input$filters,
+                filter_rsd_threshold          = input$filter_rsd_threshold,
+                threshold_mz                  = input$threshold_mz,
+                threshold_rt                  = input$threshold_rt,
+                compute_pearson_correlation   = input$compute_pearson_correlation,
+                pearson_correlation_threshold = input$pearson_correlation_threshold,
+                pearson_p_value               = input$pearson_p_value,
+                user_pos_adducts_refs         = get_ref(user_pos_adducts_refs()),
+                user_neg_adducts_refs         = get_ref(user_neg_adducts_refs()),
+                user_pos_neutral_refs         = get_ref(user_pos_neutral_refs()),
+                user_neg_neutral_refs         = get_ref(user_neg_neutral_refs())
+            )
         })
 
         output$clean <- shiny::renderPrint({
@@ -452,35 +492,52 @@ runGUI <- function() {
 
 
         # launch_msfinder_annotation
-        launch_params <- shiny::eventReactive(input$button_launch, {
-            clean <- function(l) {
-                tmp <- unlist(lapply(strsplit(l, ",", fixed = TRUE), function(x) trimws(x)))
-                tmp <- tmp[tmp != ""]
-                if (length(tmp) == 0) return(NULL)
-                else                  return(tmp)
-            }
+        clean <- function(l) {
+            tmp <- unlist(lapply(strsplit(l, ",", fixed = TRUE), function(x) trimws(x)))
+            tmp <- tmp[tmp != ""]
+            if (length(tmp) == 0) return(NULL) else return(unique(tmp))
+        }
 
-            cpmd <- clean(input$compound_levels)
-
-            biosoc <- clean(input$biosoc_levels)
-            if (is.null(biosoc)) biosoc <- c("generic")
-
+        compounds <- shiny::reactive(clean(input$compound_levels))
+        biosoc <- shiny::reactive({
+            tmp <- clean(input$biosoc_levels)
+            if (is.null(tmp)) c("generic") else tmp
+        })
+        scores <- shiny::reactive({
             tmp_scores <- lapply(clean(input$levels_scores), strsplit, split = ":", fixed = TRUE)
             if (length(tmp_scores) == 0) scores <- NULL
             else {
                 scores <- list()
-                for (x in tmp_scores) scores[x[[1]][1]] <- ifelse(is.na(x[[1]][2]) | x[[1]][2] == "", 1, x[[1]][2])
+                for (x in tmp_scores) scores[x[[1]][1]] <- ifelse(is.na(x[[1]][2]) | x[[1]][2] == "",
+                                                                  1,
+                                                                  as.numeric(x[[1]][2]))
             }
+            scores
+        })
 
-            list(compound_levels = cpmd,
-                 biosoc_levels   = biosoc,
-                 levels_scores   = scores)
+        output$compound_levels <- shiny::renderTable({
+            shiny::req(compounds())
+            data.frame("Rank" = c(1:length(compounds())), "Compound level" = compounds())
+        })
+        output$biosoc_levels   <- shiny::renderTable(
+            data.frame("Rank" = c(1:length(unique(c(biosoc(), "generic")))),
+                       "Biosource level" = unique(c(biosoc(), "generic")))
+        )
+        output$levels_scores   <- shiny::renderTable(
+            data.frame(Level = names(scores()), Multiplier = unlist(scores(), use.names = FALSE))
+        )
+
+        launch_params <- shiny::eventReactive(input$button_launch, {
+            list(compound_levels = compounds(),
+                 biosoc_levels   = biosoc(),
+                 levels_scores   = scores())
         })
 
         output$launch <- shiny::renderPrint({
             shiny::req(input$button_launch > 0)
             shiny::req(exists("analysis_directory", envir = mscleanrCache))
             shiny::req(launch_params())
+            # print(launch_params())
             waiter <- fun_waiter("Annotating peaks with MS-FINDER data...")
             waiter$show()
             tryCatch(
@@ -504,6 +561,13 @@ runGUI <- function() {
                 finally = waiter$hide()
             )
         })
+
+        # Datasets
+        output$adducts_pos <- shiny::renderDataTable(mass_adducts_pos,      escape = FALSE, options = list(pageLength = 10))
+        output$adducts_neg <- shiny::renderDataTable(mass_adducts_neg,      escape = FALSE, options = list(pageLength = 10))
+        output$nn_pos      <- shiny::renderDataTable(mass_neutral_loss_pos, escape = FALSE, options = list(pageLength = 10))
+        output$nn_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
+        output$isotopes    <- shiny::renderDataTable(mass_isotopes,         escape = FALSE, options = list(pageLength = 10))
 
 
         shiny::onStop(function() { assign("shiny_running", FALSE, envir = mscleanrCache) })

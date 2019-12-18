@@ -1,7 +1,7 @@
 
 #' Convert the final CSV file post annotations to MSP format.
 #'
-#' @param min_score Peaks must have a final score >= \code{min_score} to be exported to the msp file.
+#' @param min_score Peaks must have a final score >= \code{min_score} to be exported to the MSP files.
 #' @export
 convert_csv_to_msp <- function(min_score = 20) {
     csv_data <- import_data("annotated_data-normalized")

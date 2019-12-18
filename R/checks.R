@@ -179,10 +179,13 @@ clean_for_current_run <- function(filetype, create_dir = FALSE, ...) {
 #' @param ... Additional parameters passed on to \code{\link{get_project_file_path}}.
 check_path <- function(filetype, stop = TRUE, na_msg = NA, ...) {
     path <- get_project_file_path(filetype, ...)
-    if (is.na(path)        &  stop) stop_script(na_msg)
-    if (is.na(path)        & !stop) print_warning(na_msg)
-    if (!file.exists(path) &  stop) stop_script("Cannot find ", path)
-    if (!file.exists(path) & !stop) print_warning("Cannot find ", path)
+    if (stop) {
+        if (is.na(path))        stop_script(na_msg)
+        if (!file.exists(path)) stop_script("Cannot find ", path)
+    } else {
+             if (is.na(path))        print_warning(na_msg)
+        else if (!file.exists(path)) print_warning("Cannot find ", path)  # file.exists(NA) causes an exception
+    }
 }
 
 

@@ -15,4 +15,7 @@ mass_isotopes
 \description{
 Masses of isotopes.
 }
+\seealso{
+\code{\link{mass_adducts_neg}}, \code{\link{mass_adducts_pos}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_neutral_loss_pos}}
+}
 \keyword{datasets}

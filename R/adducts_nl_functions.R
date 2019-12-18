@@ -25,9 +25,11 @@ get_adducts_nl_links <- function(data_to_treat,
 
     # pos
     if (is.na(user_pos_neutral_refs)) {
+        print_message("Using package neutral losses for positive mode")
         utils::data("mass_neutral_loss_pos", package="mscleanr", envir=environment())
         current_mass_nl <- get("mass_neutral_loss_pos", envir=environment())  # redundant, but makes the syntax checker happy
     } else {
+        print_message("Using personalized reference file for neutral losses in positive mode")
         current_mass_nl <- user_pos_neutral_refs
         names(current_mass_nl) <- c("name", "m")
     }
@@ -43,9 +45,11 @@ get_adducts_nl_links <- function(data_to_treat,
 
     # neg
     if (is.na(user_neg_neutral_refs)) {
+        print_message("Using package neutral losses for negative mode")
         utils::data("mass_neutral_loss_neg", package="mscleanr", envir=environment())
         current_mass_nl <- get("mass_neutral_loss_neg", envir=environment())  # redundant, but makes the syntax checker happy
     } else {
+        print_message("Using personalized reference file for neutral losses in negative mode")
         current_mass_nl <- user_neg_neutral_refs
         names(current_mass_nl) <- c("name", "m")
     }
@@ -173,20 +177,24 @@ detect_posneg_combinations <- function(peaks_data_pos, peaks_data_neg, threshold
 #' @return A 3-columns data.frame with the pairs of adducts and their mass difference values.
 compute_massdiff <- function(user_adduct_pos = NA, user_adduct_neg = NA, significance_mass_threshold = NA) {
     if (is.na(user_adduct_pos)) {
+        print_message("Using package positive adducts")
         # https://r.789695.n4.nabble.com/no-visible-binding-for-global-variable-for-data-sets-in-a-package-tp4696053p4696079.html
         utils::data("mass_adducts_pos", package="mscleanr", envir=environment())
         adduct_pos <- get("mass_adducts_pos", envir=environment())  # redundant, but makes the syntax checker happy
     }
     else {
+        print_message("Using personalized reference file for positive adducts")
         adduct_pos <- user_adduct_pos
         names(adduct_pos) <- c("adduct", "mass")
     }
 
     if (is.na(user_adduct_neg)) {
+        print_message("Using package negative adducts")
         utils::data("mass_adducts_neg", package="mscleanr", envir=environment())
         adduct_neg <- get("mass_adducts_neg", envir=environment())  # redundant, but makes the syntax checker happy
     }
     else {
+        print_message("Using personalized reference file for negative adducts")
         adduct_neg <- user_adduct_neg
         names(adduct_pos) <- c("adduct", "mass")
     }

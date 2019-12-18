@@ -23,6 +23,8 @@ NULL
 #'   \item{adduct}{name of the adduct}
 #'   \item{diff}{mass difference with M in negative mode}
 #' }
+#'
+#' @seealso \code{\link{mass_adducts_pos}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_neutral_loss_pos}}, \code{\link{mass_isotopes}}
 "mass_adducts_neg"
 
 
@@ -34,6 +36,7 @@ NULL
 #'   \item{adduct}{name of the adduct}
 #'   \item{diff}{mass difference with M in positive mode}
 #' }
+#' @seealso \code{\link{mass_adducts_neg}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_neutral_loss_pos}}, \code{\link{mass_isotopes}}
 "mass_adducts_pos"
 
 
@@ -45,6 +48,8 @@ NULL
 #'   \item{name}{name of the isotope}
 #'   \item{m}{mass}
 #' }
+#'
+#' @seealso \code{\link{mass_adducts_neg}}, \code{\link{mass_adducts_pos}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_neutral_loss_pos}}
 "mass_isotopes"
 
 
@@ -56,6 +61,8 @@ NULL
 #'   \item{name}{name of the neutral loss}
 #'   \item{m}{mass in negative mode}
 #' }
+#'
+#' @seealso \code{\link{mass_adducts_neg}}, \code{\link{mass_adducts_pos}}, \code{\link{mass_neutral_loss_pos}}, \code{\link{mass_isotopes}}
 "mass_neutral_loss_neg"
 
 
@@ -67,4 +74,6 @@ NULL
 #'   \item{name}{name of the neutral loss}
 #'   \item{m}{mass in positive mode}
 #' }
+#'
+#' @seealso \code{\link{mass_adducts_neg}}, \code{\link{mass_adducts_pos}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_isotopes}}
 "mass_neutral_loss_pos"

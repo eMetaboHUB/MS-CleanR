@@ -14,6 +14,6 @@ keep_top_peaks(selection_criterion, n = 1, export_filtered_peaks = TRUE)
 \item{export_filtered_peaks}{Copy peaks files corresponding to the peaks remaining after filtering in a new folder.}
 }
 \description{
-Keeps \code{n} peaks by cluster.
+Keeps \code{n} peaks by cluster and by method.
 If there are ties, more than \code{n} peaks can be selected ( see \code{\link[dplyr]{top_n}} for more information).
 }

@@ -15,4 +15,7 @@ mass_adducts_pos
 \description{
 Mass differences of adducts with the original compound M, in positive mode.
 }
+\seealso{
+\code{\link{mass_adducts_neg}}, \code{\link{mass_neutral_loss_neg}}, \code{\link{mass_neutral_loss_pos}}, \code{\link{mass_isotopes}}
+}
 \keyword{datasets}
