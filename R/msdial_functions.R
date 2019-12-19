@@ -47,19 +47,18 @@ import_msdial_data <- function(filter_blk, filter_blk_threshold, filter_mz, filt
     msdial_neg_links <- extract_msdial_links(msdial_neg[c("Alignment.ID", "id", "Adduct.type", "Post.curation.result")])
     links <- clear_duplicate_links(rbind(msdial_pos_links, msdial_neg_links))
 
-    # average of all samples
-    is_sample <- !samples$Script_class %in% c("QC", "Blank", "Standard")
-    if(nrow(samples[is_sample,]) >= 1) {
-        peak_data$avg_Samples <- rowMeans(data.frame(peak_data[samples[is_sample,]$Column_name]))
-    }
-
-    # ratio Blank
-         if("QC"       %in% samples$Script_class) peak_data$ratio_Blank <- peak_data$avg_Blank / peak_data$avg_QC
-    else if("Standard" %in% samples$Script_class) peak_data$ratio_Blank <- peak_data$avg_Blank / peak_data$avg_Standard
-    else                                          peak_data$ratio_Blank <- peak_data$avg_Blank / peak_data$avg_Samples
-
     # filters
     if (filter_blk) {
+        # on Height data
+        height_data <- rbind(import_msdial_file("pos", samples, normalized = FALSE),
+                             import_msdial_file("neg", samples, normalized = FALSE))
+        # ratio Blank
+             if("QC"       %in% samples$Script_class) height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_QC
+        else if("Standard" %in% samples$Script_class) height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_Standard
+        else                                          height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_Samples
+
+        height_data <- height_data[c("id", "ratio_Blank")]
+        peak_data <- merge(peak_data, height_data, by = "id", all.x = TRUE)
         export_data(peak_data[peak_data$ratio_Blank >= filter_blk_threshold,], "deleted_blk")
         peak_data <- peak_data[peak_data$ratio_Blank < filter_blk_threshold,]
     }
@@ -130,12 +129,12 @@ import_msdial_data <- function(filter_blk, filter_blk_threshold, filter_mz, filt
 #'
 #' @eval recurrent_params("source")
 #' @param samples A data.frame containing the samples information.
+#' @param normalized Whether to get the Normalized MS-DIAL file or the Height MS-DIAL file (used for blank filtering).
 #' @return A data.frame containing MSDial MS data.
-import_msdial_file <- function(source, samples) {
-    dial <- utils::read.csv(get_project_file_path("normalized_ms_data", source = source),
-                            sep = "\t",
-                            skip = 4,
-                            na.strings = c("", "NA", "null"))
+import_msdial_file <- function(source, samples, normalized = TRUE) {
+    if (normalized) path <- get_project_file_path("normalized_ms_data", source = source)
+    else            path <- get_project_file_path("height_ms_data", source = source)
+    dial <- utils::read.csv(path, sep = "\t", skip = 4, na.strings = c("", "NA", "null"))
 
     # column names: order is samples, avg then std
     corr <- unique(samples[, c("Class", "Script_class")])
@@ -148,9 +147,16 @@ import_msdial_file <- function(source, samples) {
     # samples
     names(dial)[(ncol(dial) - length(samples$Sample) - 2*nrow(corr) + 1):(ncol(dial) - 2*nrow(corr))] <- samples$Column_name
 
+    # average of all samples
+    is_sample <- !samples$Script_class %in% c("QC", "Blank", "Standard")
+    if(nrow(samples[is_sample,]) >= 1) {
+        dial$avg_Samples <- rowMeans(data.frame(dial[samples[is_sample,]$Column_name]))
+    }
+
     dial$Metabolite.name <- as.character(dial$Metabolite.name)
     dial$source <- as.factor(source)
     dial$id <- as.character(paste0(source, "_", dial$Alignment.ID))
+
     return(dial)
 }
 

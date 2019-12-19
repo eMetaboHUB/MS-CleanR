@@ -4,7 +4,10 @@
 \alias{check_architecture_for_clean_msdial_data}
 \title{Check project architecture before running \code{\link{clean_msdial_data}}.}
 \usage{
-check_architecture_for_clean_msdial_data()
+check_architecture_for_clean_msdial_data(filter_blk)
+}
+\arguments{
+\item{filter_blk}{A boolean indicating whether or not to delete rows with too much noise.}
 }
 \description{
 Check project architecture before running \code{\link{clean_msdial_data}}.

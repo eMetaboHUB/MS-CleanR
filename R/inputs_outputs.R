@@ -15,6 +15,7 @@ get_project_file_path <- function(filetype, source = NA, msfinder_info = NA, msf
     wd <- file.path(get("analysis_directory", envir = mscleanrCache), source)
     if (filetype == "source_folder")         return(wd)
     if (filetype == "normalized_ms_data")    return(get_pattern_file(wd, "^Normalized"))
+    if (filetype == "height_ms_data")        return(get_pattern_file(wd, "^Height"))
     if (filetype == "msdial_peaks")          return(file.path(wd, "peaks"))
     if (filetype == "msdial_filtered_peaks") return(file.path(wd, "filtered_peaks"))
     if (filetype == "msfinder_data")         return(get_pattern_file(file.path(wd, paste0("msf_", msfinder_lvl)),

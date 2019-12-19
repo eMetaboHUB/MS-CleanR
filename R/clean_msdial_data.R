@@ -72,7 +72,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
                                        references_neutral_pos      = user_pos_neutral_refs,
                                        references_neutral_neg      = user_neg_neutral_refs)
 
-    check_architecture_for_clean_msdial_data()
+    check_architecture_for_clean_msdial_data(filter_blk)
 
     print_message("*** Treating ", get("analysis_directory", envir = mscleanrCache), " ***")
 

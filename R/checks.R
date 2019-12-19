@@ -1,6 +1,8 @@
 
 #' Check project architecture before running \code{\link{clean_msdial_data}}.
-check_architecture_for_clean_msdial_data <- function() {
+#'
+#' @eval recurrent_params("filter_blk")
+check_architecture_for_clean_msdial_data <- function(filter_blk) {
     check_main_architecture()
 
     clean_for_current_run("final_folder", create_dir = TRUE)
@@ -10,6 +12,10 @@ check_architecture_for_clean_msdial_data <- function() {
         check_path("normalized_ms_data",
                    source = source,
                    na_msg = paste0("Can't find normalized MS data for ", source, " mode."))
+        if (filter_blk) {
+            check_path("height_ms_data",
+                       source = source,
+                       na_msg = paste0("Can't find height MS data for ", source, " mode (necessary for blank filtering)."))}
     }
 }
 
