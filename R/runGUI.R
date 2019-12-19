@@ -41,34 +41,29 @@ runGUI <- function() {
                                         ", separated by commas",
                                         ifelse(blank_if_none, " (leave blank if none).", ".")),
                                  placeholder = placeholder,
-                                 width = "90%")
-            ),
-            shiny::column(4, shiny::tableOutput(id))
-        )
+                                 width = "90%")),
+            shiny::column(4, shiny::tableOutput(id)))
     }
+
+    dataset_panel <- function(title, id) shiny::tabPanel(title,
+                                                         shiny::downloadButton(paste0("dl_", id)),
+                                                         shiny::dataTableOutput(id))
 
     mainButton <- function(id, label) shiny::actionButton(id, label,  width = "100%", class = "btn btn-success")
 
     warning_perso <- function(condition, text) {
-        shiny::conditionalPanel(
-            condition = condition,
-            shiny::div(class = "panel panel-warning",
-                shiny::div(class = "panel-heading",
-                    shiny::h3(class = "panel-title", text)
-                )
-            )
-        )
+        shiny::conditionalPanel(condition = condition,
+                                shiny::div(class = "panel panel-warning",
+                                           shiny::div(class = "panel-heading",
+                                                      shiny::h3(class = "panel-title", text))))
     }
 
     warning_wd <- function() warning_perso("document.getElementById('button_clean').disabled",
                                            "Please select the project directory.")
 
-    fun_waiter <- function(h1) {
-        waiter::Waiter$new(html = shiny::div(shiny::h1(h1, style = "color: white"),
-                                             waiter::spin_double_bounce()),
-                           color = "#4CAF50")
-    }
-
+    fun_waiter <- function(h1)  waiter::Waiter$new(html = shiny::div(shiny::h1(h1, style = "color: white"),
+                                                                     waiter::spin_double_bounce()),
+                                                   color = "#4CAF50")
 
 
     ui <- shiny::tagList(
@@ -370,11 +365,11 @@ runGUI <- function() {
 
                 shiny::mainPanel(
                     shiny::tabsetPanel(
-                        shiny::tabPanel("Positive adducts",                shiny::dataTableOutput("adducts_pos")),
-                        shiny::tabPanel("Negative adducts",                shiny::dataTableOutput("adducts_neg")),
-                        shiny::tabPanel("Neutral losses in positive mode", shiny::dataTableOutput("nn_pos")),
-                        shiny::tabPanel("Neutral losses in negative mode", shiny::dataTableOutput("nn_neg")),
-                        shiny::tabPanel("Isotopes",                        shiny::dataTableOutput("isotopes"))
+                        dataset_panel("Positive adducts",                "adducts_pos"),
+                        dataset_panel("Negative adducts",                "adducts_neg"),
+                        dataset_panel("Neutral losses in positive mode", "nl_pos"),
+                        dataset_panel("Neutral losses in negative mode", "nl_neg"),
+                        shiny::tabPanel("Isotopes", shiny::dataTableOutput("isotopes"))
                     )
                 )
             )
@@ -572,9 +567,17 @@ runGUI <- function() {
         # Datasets
         output$adducts_pos <- shiny::renderDataTable(mass_adducts_pos,      escape = FALSE, options = list(pageLength = 10))
         output$adducts_neg <- shiny::renderDataTable(mass_adducts_neg,      escape = FALSE, options = list(pageLength = 10))
-        output$nn_pos      <- shiny::renderDataTable(mass_neutral_loss_pos, escape = FALSE, options = list(pageLength = 10))
-        output$nn_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
+        output$nl_pos      <- shiny::renderDataTable(mass_neutral_loss_pos, escape = FALSE, options = list(pageLength = 10))
+        output$nl_neg      <- shiny::renderDataTable(mass_neutral_loss_neg, escape = FALSE, options = list(pageLength = 10))
         output$isotopes    <- shiny::renderDataTable(mass_isotopes,         escape = FALSE, options = list(pageLength = 10))
+
+        dl <- function(data, filename) shiny::downloadHandler(filename = filename,
+                                                              content = function(file) vroom::vroom_write(data, file, delim = ","))
+        output$dl_adducts_pos <- dl(mass_adducts_pos,      "positive_adducts.csv")
+        output$dl_adducts_neg <- dl(mass_adducts_neg,      "negative_adducts.csv")
+        output$dl_nl_pos      <- dl(mass_neutral_loss_pos, "positive_neutral_losses.csv")
+        output$dl_nl_neg      <- dl(mass_neutral_loss_neg, "negative_neutral_losses.csv")
+
 
 
         shiny::onStop(function() { assign("shiny_running", FALSE, envir = mscleanrCache) })
