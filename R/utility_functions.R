@@ -70,10 +70,10 @@ matrix_to_df <- function(matrix_in, value_name = "Freq") {
 #' @param msg A string containing the message content.
 print_peaks_status <- function(peaks, msg) {
     print_message(msg,
-                  nrow(peaks[!is.na(peaks$source) & peaks$source == "pos",]), " positive, ",
-                  nrow(peaks[!is.na(peaks$source) & peaks$source == "neg",]), " negative, ",
-                  nrow(peaks[ is.na(peaks$source),]),                         " nul, ",
-                  nrow(peaks),                                                " total"
+                  nrow(peaks[!is.na(peaks$source) & peaks$source == "pos",]), "positive,",
+                  nrow(peaks[!is.na(peaks$source) & peaks$source == "neg",]), "negative,",
+                  nrow(peaks[ is.na(peaks$source),]),                         "NA,",
+                  nrow(peaks),                                                "total"
             )
 }
 
@@ -92,8 +92,8 @@ substrRight <- function(x, n = 1) substr(x, nchar(x)-n+1, nchar(x))
 #'
 #' @param ... Strings to print.
 print_message <- function(...) {
-    if (get("shiny_running", envir = mscleanrCache)) print(crayon::green(paste0(...)))
-    else                                             message(crayon::green(paste0(...)))
+    if (get("shiny_running", envir = mscleanrCache)) cat(..., "\n")
+    else                                             message(crayon::green(...))
 }
 
 
@@ -102,8 +102,8 @@ print_message <- function(...) {
 #'
 #' @param ... Strings to print.
 print_warning <- function(...) {
-    if (get("shiny_running", envir = mscleanrCache)) print(crayon::yellow(paste0(...)))
-    else                                             message(crayon::yellow(paste0(...)))
+    if (get("shiny_running", envir = mscleanrCache)) cat("/!\\", ..., "\n")
+    else                                             message(crayon::yellow(...))
 }
 
 

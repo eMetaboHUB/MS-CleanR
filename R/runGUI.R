@@ -92,10 +92,13 @@ runGUI <- function() {
 
                 shiny::mainPanel(
                     warning_wd(),
-                    # TODO changer peut-être parce que pas stable
                     #                   project_directory,
-                    shinyDirectoryInput::directoryInput("project_directory",
-                                                        label = "Select the project directory"),
+                    shinyFiles::shinyDirButton("project_directory",
+                                               "Select the project directory",
+                                               "Select the project directory",
+                                               class = "btn btn-success",
+                                               style = "width: 100%"),
+                    shiny::verbatimTextOutput("project_directory_path"),
                     #                   overwrite = TRUE)
                     shiny::checkboxInput("overwrite",
                                          "Overwrite existing results?",
@@ -382,23 +385,28 @@ runGUI <- function() {
 
     server <- function(input, output, session) {
         # Project directory
-        shinyjs::disable("button_clean")
-        shinyjs::disable("button_keep")
-        shinyjs::disable("button_launch")
-        shinyjs::disable("button_convert")
+        volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
+        shinyFiles::shinyDirChoose(input,
+                                   "project_directory",
+                                   roots = volumes,
+                                   session = session)
 
-        shiny::observeEvent(input$project_directory, {
-            shiny::req(input$project_directory > 0)  # condition prevents handler execution on initial app launch
-            default <- ifelse(exists("analysis_directory", envir = mscleanrCache),
-                              get("analysis_directory", envir = mscleanrCache),
-                              "~")
-            path <- shinyDirectoryInput::choose.dir(default = default)
-            assign("analysis_directory", path, envir = mscleanrCache)
-            shinyDirectoryInput::updateDirectoryInput(session, "project_directory", value = path)
-            shinyjs::enable("button_clean")
-            shinyjs::enable("button_keep")
-            shinyjs::enable("button_launch")
-            shinyjs::enable("button_convert")
+        output$project_directory_path <- shiny::renderPrint({
+            if (is.integer(input$project_directory)) {
+                cat("No project directory has been selected")
+                shinyjs::disable("button_clean")
+                shinyjs::disable("button_keep")
+                shinyjs::disable("button_launch")
+                shinyjs::disable("button_convert")
+            } else {
+                path <- shinyFiles::parseDirPath(volumes, input$project_directory)
+                assign("analysis_directory", path, envir = mscleanrCache)
+                cat(path)
+                shinyjs::enable("button_clean")
+                shinyjs::enable("button_keep")
+                shinyjs::enable("button_launch")
+                shinyjs::enable("button_convert")
+            }
         })
 
         shiny::observeEvent(input$overwrite, { assign("overwrite", input$overwrite, envir = mscleanrCache) })
@@ -537,7 +545,6 @@ runGUI <- function() {
             shiny::req(input$button_launch > 0)
             shiny::req(exists("analysis_directory", envir = mscleanrCache))
             shiny::req(launch_params())
-            # print(launch_params())
             waiter <- fun_waiter("Annotating peaks with MS-FINDER data...")
             waiter$show()
             tryCatch(
