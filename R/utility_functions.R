@@ -8,7 +8,8 @@ increment_strings <- function(strings_to_increment, patterns) {
     new_names <- data.frame(old = strings_to_increment, new = NA, stringsAsFactors = FALSE)
     for(pattern in patterns) {
         if (nrow(new_names[new_names$old == pattern,]) > 0) new_names[new_names$old == pattern, "old"] <- paste0(pattern, ".0")
-        new_names[grepl(pattern, new_names$old), "new"] <- substrRight(new_names[grepl(pattern, new_names$old), "old"])
+        new_names[grepl(pattern, new_names$old), "new"] <- stringr::str_match(new_names[grepl(pattern, new_names$old), "old"],
+                                                                              ".+?(\\d+)$")[,2]
         new_names[grepl(pattern, new_names$old), "new"] <- paste(pattern,
                                                                  as.numeric(new_names[grepl(pattern, new_names$old), "new"]) + 1,
                                                                  sep = ".")
