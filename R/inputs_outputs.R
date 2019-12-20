@@ -111,8 +111,10 @@ export_data <- function(data_to_export, filetype, source = NA, empty_na = FALSE)
         igraph::write_graph(data_to_export, get_project_file_path(filetype), format = "graphml")
     } else {
         path <- get_project_file_path(filetype, source = source)
-        if (empty_na) utils::write.csv(data_to_export, path, row.names = FALSE, na = "")
-        else          utils::write.csv(data_to_export, path, row.names = FALSE)
+        suppressMessages({
+            if (empty_na) vroom::vroom_write(data_to_export, path, delim = ",", na = "")
+            else          vroom::vroom_write(data_to_export, path, delim = ",")
+        })
     }
 }
 
@@ -123,9 +125,11 @@ export_data <- function(data_to_export, filetype, source = NA, empty_na = FALSE)
 #' @eval recurrent_params("filetype")
 #' @param ... Additional parameters passed on to \code{\link{get_project_file_path}}.
 import_data <- function(filetype, ...) {
-    return(utils::read.csv(get_project_file_path(filetype, ...),
-                           stringsAsFactors = FALSE,
-                           na.strings = c("NA", "", "N/A")))
+    suppressMessages(
+        return(as.data.frame(vroom::vroom(get_project_file_path(filetype, ...),
+                                          delim = ",",
+                                          na = c("NA", "", "N/A"))))
+    )
 }
 
 

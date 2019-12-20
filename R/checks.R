@@ -70,13 +70,29 @@ check_architecture_for_launch_msfinder_annotation <- function(msfinder_biosoc_le
 
 
 #' Check the project main architecture
-check_main_architecture <- function() {
+#'
+#' @param posneg Whether to check the existence of pos/neg directories.
+check_main_architecture <- function(posneg = TRUE) {
     if (!exists("analysis_directory", envir = mscleanrCache)) {
         stop_script("No project directory chosen. Please do so with choose_project_directory().")
     }
     check_path(filetype = NULL, na_msg = "Project directory can't be NA.")
-    check_path("source_folder", source = "pos")
-    check_path("source_folder", source = "neg")
+    if (posneg) {
+        check_path("source_folder", source = "pos")
+        check_path("source_folder", source = "neg")
+    }
+}
+
+
+
+#' Check before running \code{\link{launch_msfinder_annotation}}.
+#'
+#' @param min_score Input parameter to check.
+check_for_convert_csv_to_msp <- function(min_score) {
+    check_main_architecture(posneg = FALSE)
+    check_path("annotated_data-normalized")
+    check_path("samples")
+    check_positive_num(min_score)
 }
 
 

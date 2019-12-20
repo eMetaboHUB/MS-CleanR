@@ -4,6 +4,8 @@
 #' @param min_score Peaks must have a final score >= \code{min_score} to be exported to the MSP files.
 #' @export
 convert_csv_to_msp <- function(min_score = 20) {
+    check_for_convert_csv_to_msp(min_score)
+
     csv_data <- import_data("annotated_data-normalized")
     samples <- import_data("samples")
 
