@@ -37,6 +37,9 @@ assign("filter_rsd",
 assign("filter_rsd_threshold",
        "A numerical threshold for relative standard deviation filtering: rows with relative standard deviation >= \\code{filter_rsd_threshold} in each class are deleted. Only used if \\code{filter_rsd} is \\code{TRUE}.",
        envir = mscleanrDocParams)
+assign("filter_blk_ghost_peaks",
+       "A boolean indicating whether or not to delete blank ghost peaks (see publication for more information).",
+       envir = mscleanrDocParams)
 assign("level",
        "A string indicating the biosource level to consider.",
        envir = mscleanrDocParams)

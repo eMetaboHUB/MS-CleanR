@@ -57,6 +57,7 @@ get_project_file_path <- function(filetype, source = NA, msfinder_info = NA, msf
     if (filetype == "deleted_blk")                 return(file.path(wd, "deleted_blanks.csv"))
     if (filetype == "deleted_mz")                  return(file.path(wd, "deleted_mz.csv"))
     if (filetype == "deleted_rsd")                 return(file.path(wd, "deleted_rsd.csv"))
+    if (filetype == "deleted_ghosts")              return(file.path(wd, "deleted_blank_ghosts.csv"))
 
     # CAD/PDA
     if (startsWith(filetype, "CAD_") | startsWith(filetype, "PDA_")) {

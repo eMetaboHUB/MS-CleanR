@@ -99,12 +99,13 @@ check_for_convert_csv_to_msp <- function(min_score) {
 
 #' Check if input parameters are correct before running \code{clean_msdial_data}.
 #'
-#' @param filter_blk,filter_blk_threshold,filter_mz,filter_rsd,filter_rsd_threshold,threshold_mz,threshold_rt,compute_pearson_correlation,pearson_threshold,pearson_p_value,references_adduct_pos,references_adduct_neg,references_neutral_pos,references_neutral_neg Input parameters to check.
+#' @param filter_blk,filter_blk_threshold,filter_mz,filter_rsd,filter_rsd_threshold,filter_blk_ghost_peaks,threshold_mz,threshold_rt,compute_pearson_correlation,pearson_threshold,pearson_p_value,references_adduct_pos,references_adduct_neg,references_neutral_pos,references_neutral_neg Input parameters to check.
 check_input_parameters_msdial_data <- function(filter_blk,
                                                filter_blk_threshold,
                                                filter_mz,
                                                filter_rsd,
                                                filter_rsd_threshold,
+                                               filter_blk_ghost_peaks,
                                                threshold_mz,
                                                threshold_rt,
                                                compute_pearson_correlation,
@@ -117,6 +118,7 @@ check_input_parameters_msdial_data <- function(filter_blk,
     check_boolean(filter_blk,                  "filter_blk")
     check_boolean(filter_mz,                   "filter_mz")
     check_boolean(filter_rsd,                  "filter_rsd")
+    check_boolean(filter_blk_ghost_peaks,      "filter_blk_ghost_peaks")
     check_boolean(compute_pearson_correlation, "compute_pearson_correlation")
 
     check_positive_num(threshold_mz,     "threshold_mz")

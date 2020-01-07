@@ -12,6 +12,7 @@ clean_msdial_data(
   filter_rsd_threshold = 30,
   threshold_mz = 0.05,
   threshold_rt = 0.1,
+  filter_blk_ghost_peaks = TRUE,
   user_pos_adducts_refs = NA,
   user_neg_adducts_refs = NA,
   user_pos_neutral_refs = NA,
@@ -35,6 +36,8 @@ clean_msdial_data(
 \item{threshold_mz}{A numerical value indicating the mass tolerance in Dalton for the detection of adducts and neutral losses.}
 
 \item{threshold_rt}{A numerical value indicating the retention time tolerance.}
+
+\item{filter_blk_ghost_peaks}{A boolean indicating whether or not to delete blank ghost peaks (see publication for more information).}
 
 \item{user_neg_neutral_refs, user_pos_neutral_refs, user_pos_adducts_refs, user_neg_adducts_refs}{An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}
 

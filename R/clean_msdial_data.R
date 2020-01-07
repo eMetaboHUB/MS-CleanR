@@ -1,7 +1,7 @@
 
 #' Combine pos and neg files from MSDial and filter peaks according to user parameters
 #'
-#' @eval recurrent_params("filter_blk", "filter_blk_threshold", "filter_mz", "filter_rsd", "filter_rsd_threshold", "threshold_rt", "threshold_mz", "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs")
+#' @eval recurrent_params("filter_blk", "filter_blk_threshold", "filter_mz", "filter_rsd", "filter_rsd_threshold", "filter_blk_ghost_peaks", "threshold_rt", "threshold_mz", "user_neg_neutral_refs,user_pos_neutral_refs,user_pos_adducts_refs,user_neg_adducts_refs")
 #' @param compute_pearson_correlation Compute Pearson correlation between peaks to detect clusters.
 #' @param pearson_correlation_threshold Ignore links having a Pearson correlation < threshold (default: 0.8).
 #' @param pearson_p_value Ignore links having a non-significative Pearson correlation (default: 0.05).
@@ -49,6 +49,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
                               filter_rsd_threshold = 30,
                               threshold_mz = 0.05,
                               threshold_rt = 0.1,
+                              filter_blk_ghost_peaks = TRUE,
                               user_pos_adducts_refs = NA,
                               user_neg_adducts_refs = NA,
                               user_pos_neutral_refs = NA,
@@ -62,6 +63,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
                                        filter_mz                   = filter_mz,
                                        filter_rsd                  = filter_rsd,
                                        filter_rsd_threshold        = filter_rsd_threshold,
+                                       filter_blk_ghost_peaks      = filter_blk_ghost_peaks,
                                        threshold_mz                = threshold_mz,
                                        threshold_rt                = threshold_rt,
                                        compute_pearson_correlation = compute_pearson_correlation,
@@ -81,6 +83,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
                   filter_mz                   = filter_mz,
                   filter_rsd                  = filter_rsd,
                   filter_rsd_threshold        = filter_rsd_threshold,
+                  filter_blk_ghost_peaks      = filter_blk_ghost_peaks,
                   threshold_mz                = threshold_mz,
                   threshold_rt                = threshold_rt,
                   compute_pearson_correlation = compute_pearson_correlation,
@@ -88,7 +91,13 @@ clean_msdial_data <- function(filter_blk = TRUE,
                   pearson_p_value             = pearson_p_value)
 
     # MSDIAL
-    msdial <- import_msdial_data(filter_blk, filter_blk_threshold, filter_mz, filter_rsd, filter_rsd_threshold)
+    msdial <- import_msdial_data(filter_blk,
+                                 filter_blk_threshold,
+                                 filter_mz,
+                                 filter_rsd,
+                                 filter_rsd_threshold,
+                                 filter_blk_ghost_peaks,
+                                 threshold_mz)
     msdial_peak_data <- msdial$peak_data[!grepl('NA', rownames(msdial$peak_data)),]  # Fix for occasional small bug
     print_peaks_status(msdial_peak_data, "MSDial peaks after filtering:")
     msdial_links <- msdial$links
@@ -115,9 +124,11 @@ clean_msdial_data <- function(filter_blk = TRUE,
             }
 
             # Computing correlations
-            cor_res <- Hmisc::rcorr(t(data.frame(tmp_peak_data,
-                                                 row.names = msdial_peak_data[msdial_peak_data$source == source,]$id)),
-                                    type="pearson")
+            suppressWarnings(
+                cor_res <- Hmisc::rcorr(t(data.frame(tmp_peak_data,
+                                                     row.names = msdial_peak_data[msdial_peak_data$source == source,]$id)),
+                                        type="pearson")
+            )
             cor_res <- merge(matrix_to_df(cor_res$r, "r"), matrix_to_df(cor_res$P, "P"))  # Var1 Var2 r P
             names(cor_res) <- c("id.1", "id.2", "correlation", "P")
 

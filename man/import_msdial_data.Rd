@@ -9,7 +9,9 @@ import_msdial_data(
   filter_blk_threshold,
   filter_mz,
   filter_rsd,
-  filter_rsd_threshold
+  filter_rsd_threshold,
+  filter_blk_ghost_peaks,
+  threshold_mz
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ import_msdial_data(
 \item{filter_rsd}{A boolean indicating whether or not to delete rows with too much relative standard deviation in each class.}
 
 \item{filter_rsd_threshold}{A numerical threshold for relative standard deviation filtering: rows with relative standard deviation >= \code{filter_rsd_threshold} in each class are deleted. Only used if \code{filter_rsd} is \code{TRUE}.}
+
+\item{filter_blk_ghost_peaks}{A boolean indicating whether or not to delete blank ghost peaks (see publication for more information).}
+
+\item{threshold_mz}{A numerical value indicating the mass tolerance in Dalton for the detection of adducts and neutral losses.}
 }
 \value{
 A list of 4 data.frames: \code{peak_data} contains the main data about detected peaks in positive and negative modes,
