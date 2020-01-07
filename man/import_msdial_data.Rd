@@ -11,6 +11,8 @@ import_msdial_data(
   filter_rsd,
   filter_rsd_threshold,
   filter_blk_ghost_peaks,
+  filter_rmd,
+  filter_rmd_range,
   threshold_mz
 )
 }
@@ -25,7 +27,11 @@ import_msdial_data(
 
 \item{filter_rsd_threshold}{A numerical threshold for relative standard deviation filtering: rows with relative standard deviation >= \code{filter_rsd_threshold} in each class are deleted. Only used if \code{filter_rsd} is \code{TRUE}.}
 
-\item{filter_blk_ghost_peaks}{A boolean indicating whether or not to delete blank ghost peaks (see publication for more information).}
+\item{filter_blk_ghost_peaks}{A boolean indicating whether or not to delete blank ghost peaks (only used if \code{filter_blk} is TRUE, see publication for more information).}
+
+\item{filter_rmd}{A boolean indicating whether or not to delete rows with a Relative Mass Defect outside of the range provided in \code{filter_rmd_range}.}
+
+\item{filter_rmd_range}{A range of 2 integers indicating the acceptable Relative Mass Defects in ppm (only used if \code{filter_rmd} is TRUE).}
 
 \item{threshold_mz}{A numerical value indicating the mass tolerance in Dalton for the detection of adducts and neutral losses.}
 }

@@ -55,9 +55,10 @@ get_project_file_path <- function(filetype, source = NA, msfinder_info = NA, msf
     if (filetype == "annotated_data-manual_check") return(file.path(wd, "annotated_MS_peaks-manual_check.csv"))
     if (filetype == "identifying_data")            return(file.path(wd, "annotation_possibilities.csv"))
     if (filetype == "deleted_blk")                 return(file.path(wd, "deleted_blanks.csv"))
+    if (filetype == "deleted_ghosts")              return(file.path(wd, "deleted_blank_ghosts.csv"))
     if (filetype == "deleted_mz")                  return(file.path(wd, "deleted_mz.csv"))
     if (filetype == "deleted_rsd")                 return(file.path(wd, "deleted_rsd.csv"))
-    if (filetype == "deleted_ghosts")              return(file.path(wd, "deleted_blank_ghosts.csv"))
+    if (filetype == "deleted_rmd")                 return(file.path(wd, "deleted_rmd.csv"))
 
     # CAD/PDA
     if (startsWith(filetype, "CAD_") | startsWith(filetype, "PDA_")) {

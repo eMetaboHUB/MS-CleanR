@@ -37,8 +37,14 @@ assign("filter_rsd",
 assign("filter_rsd_threshold",
        "A numerical threshold for relative standard deviation filtering: rows with relative standard deviation >= \\code{filter_rsd_threshold} in each class are deleted. Only used if \\code{filter_rsd} is \\code{TRUE}.",
        envir = mscleanrDocParams)
+assign("filter_rmd",
+       "A boolean indicating whether or not to delete rows with a Relative Mass Defect outside of the range provided in \\code{filter_rmd_range}.",
+       envir = mscleanrDocParams)
+assign("filter_rmd_range",
+       "A range of 2 integers indicating the acceptable Relative Mass Defects in ppm (only used if \\code{filter_rmd} is TRUE).",
+       envir = mscleanrDocParams)
 assign("filter_blk_ghost_peaks",
-       "A boolean indicating whether or not to delete blank ghost peaks (see publication for more information).",
+       "A boolean indicating whether or not to delete blank ghost peaks (only used if \\code{filter_blk} is TRUE, see publication for more information).",
        envir = mscleanrDocParams)
 assign("level",
        "A string indicating the biosource level to consider.",

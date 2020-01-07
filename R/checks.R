@@ -99,13 +99,15 @@ check_for_convert_csv_to_msp <- function(min_score) {
 
 #' Check if input parameters are correct before running \code{clean_msdial_data}.
 #'
-#' @param filter_blk,filter_blk_threshold,filter_mz,filter_rsd,filter_rsd_threshold,filter_blk_ghost_peaks,threshold_mz,threshold_rt,compute_pearson_correlation,pearson_threshold,pearson_p_value,references_adduct_pos,references_adduct_neg,references_neutral_pos,references_neutral_neg Input parameters to check.
+#' @param filter_blk,filter_blk_threshold,filter_mz,filter_rsd,filter_rsd_threshold,filter_blk_ghost_peaks,filter_rmd,filter_rmd_range,threshold_mz,threshold_rt,compute_pearson_correlation,pearson_threshold,pearson_p_value,references_adduct_pos,references_adduct_neg,references_neutral_pos,references_neutral_neg Input parameters to check.
 check_input_parameters_msdial_data <- function(filter_blk,
                                                filter_blk_threshold,
                                                filter_mz,
                                                filter_rsd,
                                                filter_rsd_threshold,
                                                filter_blk_ghost_peaks,
+                                               filter_rmd,
+                                               filter_rmd_range,
                                                threshold_mz,
                                                threshold_rt,
                                                compute_pearson_correlation,
@@ -118,6 +120,7 @@ check_input_parameters_msdial_data <- function(filter_blk,
     check_boolean(filter_blk,                  "filter_blk")
     check_boolean(filter_mz,                   "filter_mz")
     check_boolean(filter_rsd,                  "filter_rsd")
+    check_boolean(filter_rmd,                  "filter_rmd")
     check_boolean(filter_blk_ghost_peaks,      "filter_blk_ghost_peaks")
     check_boolean(compute_pearson_correlation, "compute_pearson_correlation")
 
@@ -128,12 +131,16 @@ check_input_parameters_msdial_data <- function(filter_blk,
     check_probability(pearson_threshold,    "pearson_threshold")
     check_probability(pearson_p_value,      "pearson_p_value")
 
-    check_positive_int(filter_rsd_threshold,     "filter_rsd_threshold")
+    check_positive_int(filter_rsd_threshold, "filter_rsd_threshold")
+    check_positive_int(filter_rmd_range[1],  "filter_rmd_range first value")
+    check_positive_int(filter_rmd_range[2],  "filter_rmd_range last value")
 
     check_references(references_adduct_pos,  "positive adducts")
     check_references(references_adduct_neg,  "negative adducts")
     check_references(references_neutral_pos, "positive neutral losses")
     check_references(references_neutral_neg, "negative neutral losses")
+
+    if (filter_rmd_range[1] >= filter_rmd_range[2]) stop_script("filter_rmd_range first value must be lower than filter_rmd_range last value.")
 }
 
 

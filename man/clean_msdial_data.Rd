@@ -7,12 +7,14 @@
 clean_msdial_data(
   filter_blk = TRUE,
   filter_blk_threshold = 0.8,
+  filter_blk_ghost_peaks = TRUE,
   filter_mz = TRUE,
   filter_rsd = TRUE,
   filter_rsd_threshold = 30,
+  filter_rmd = TRUE,
+  filter_rmd_range = c(50, 3000),
   threshold_mz = 0.05,
   threshold_rt = 0.1,
-  filter_blk_ghost_peaks = TRUE,
   user_pos_adducts_refs = NA,
   user_neg_adducts_refs = NA,
   user_pos_neutral_refs = NA,
@@ -27,17 +29,21 @@ clean_msdial_data(
 
 \item{filter_blk_threshold}{A numerical threshold for noise filtering: rows with ratio mean(blank columns)/mean(qc columns) >= \code{filter_blk} are deleted (if there are no QC columns in the sample, the mean of standard columns is used, or the mean of all non-blank samples if needed).}
 
+\item{filter_blk_ghost_peaks}{A boolean indicating whether or not to delete blank ghost peaks (only used if \code{filter_blk} is TRUE, see publication for more information).}
+
 \item{filter_mz}{A boolean indicating whether or not to delete rows with masses ending in .8 or .9 (masses not found in natural products).}
 
 \item{filter_rsd}{A boolean indicating whether or not to delete rows with too much relative standard deviation in each class.}
 
 \item{filter_rsd_threshold}{A numerical threshold for relative standard deviation filtering: rows with relative standard deviation >= \code{filter_rsd_threshold} in each class are deleted. Only used if \code{filter_rsd} is \code{TRUE}.}
 
+\item{filter_rmd}{A boolean indicating whether or not to delete rows with a Relative Mass Defect outside of the range provided in \code{filter_rmd_range}.}
+
+\item{filter_rmd_range}{A range of 2 integers indicating the acceptable Relative Mass Defects in ppm (only used if \code{filter_rmd} is TRUE).}
+
 \item{threshold_mz}{A numerical value indicating the mass tolerance in Dalton for the detection of adducts and neutral losses.}
 
 \item{threshold_rt}{A numerical value indicating the retention time tolerance.}
-
-\item{filter_blk_ghost_peaks}{A boolean indicating whether or not to delete blank ghost peaks (see publication for more information).}
 
 \item{user_neg_neutral_refs, user_pos_neutral_refs, user_pos_adducts_refs, user_neg_adducts_refs}{An optional 2-column data.frame containing information about neutral losses, positive adducts or negative adducts (one column for the name and one column for the mass difference with the base compound). If no data.frame is provided, the package default list is used.}
 
