@@ -114,8 +114,8 @@ export_data <- function(data_to_export, filetype, source = NA, empty_na = FALSE)
     } else {
         path <- get_project_file_path(filetype, source = source)
         suppressMessages({
-            if (empty_na) vroom::vroom_write(data_to_export, path, delim = ",", na = "")
-            else          vroom::vroom_write(data_to_export, path, delim = ",")
+            if (empty_na) vroom::vroom_write(data_to_export, path, delim = ",", na = "", progress = FALSE)
+            else          vroom::vroom_write(data_to_export, path, delim = ",", progress = FALSE)
         })
     }
 }
@@ -130,7 +130,8 @@ import_data <- function(filetype, ...) {
     suppressMessages(
         return(as.data.frame(vroom::vroom(get_project_file_path(filetype, ...),
                                           delim = ",",
-                                          na = c("NA", "", "N/A"))))
+                                          na = c("NA", "", "N/A"),
+                                          progress = FALSE)))
     )
 }
 
@@ -140,7 +141,9 @@ import_data <- function(filetype, ...) {
 #'
 #' @param ... Parameters used for the current run of the script.
 export_params <- function(...) {
-    utils::write.csv(as.data.frame(t(as.data.frame(list(...)))),
-                     get_project_file_path("parameters"),
-                     row.names = TRUE)
+    params <- as.data.frame(list(...))
+    # Dealing with filter_rmd_range
+    params[1, "filter_rmd_range"] <- paste0("[", params[1, "filter_rmd_range"], ",", params[2, "filter_rmd_range"], "]")
+    params <- data.frame(PARAMETER = names(params), VALUE = as.character(params[1,]))
+    export_data(params, "parameters")
 }

@@ -65,13 +65,13 @@ import_msdial_data <- function(filter_blk,
         else if("Standard" %in% samples$Script_class) height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_Standard
         else                                          height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_Samples
 
-        height_data <- height_data[c("id", "ratio_Blank")]
-        peak_data <- merge(peak_data, height_data, by = "id", all.x = TRUE)
+        peak_data <- merge(peak_data, height_data[, c("id", "ratio_Blank")], by = "id", all.x = TRUE)
+        peak_data <- peak_data[!is.na(peak_data$ratio_Blank),]
         blank_peaks <- peak_data[peak_data$ratio_Blank >= filter_blk_threshold,]
         export_data(blank_peaks, "deleted_blk")
         peak_data <- peak_data[peak_data$ratio_Blank < filter_blk_threshold,]
 
-        if (filter_blk_ghost_peaks) {
+        if (filter_blk_ghost_peaks & nrow(blank_peaks) > 0) {
             ghosts <- data.frame(mz = unique(blank_peaks$Average.Mz))
             ghosts$start_mz <- round((ghosts$mz - threshold_mz / 2) * 10000) # fuzzyjoin needs integer
             ghosts$end_mz   <- round((ghosts$mz + threshold_mz / 2) * 10000)

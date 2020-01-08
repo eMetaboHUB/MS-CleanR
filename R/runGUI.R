@@ -126,36 +126,68 @@ runGUI <- function() {
                         #                   filter_blk = TRUE,
                         #                   filter_mz = TRUE,
                         #                   filter_rsd = TRUE,
-                        shiny::column(4,
+                        #                   filter_rmd = TRUE,
+                        shiny::column(3,
                             shiny::checkboxGroupInput("filters",
                                                       "What filters to use?",
-                                                      choiceNames = c("Blank ratio", "Mass filter", "RSD filter"),
-                                                      choiceValues = c("filter_blk", "filter_mz", "filter_rsd"),
-                                                      selected = c("filter_blk", "filter_mz", "filter_rsd"))
+                                                      choiceNames = c("Blank ratio",
+                                                                      "Incorrect Mass",
+                                                                      "Relative Standard Deviation",
+                                                                      "Relative Mass Defect"),
+                                                      choiceValues = c("filter_blk",
+                                                                       "filter_mz",
+                                                                       "filter_rsd",
+                                                                       "filter_rmd"),
+                                                      selected = c("filter_blk",
+                                                                   "filter_mz",
+                                                                   "filter_rsd",
+                                                                   "filter_rmd"))
                         ),
-                        #                   filter_blk_threshold = 0.8,
-                        shiny::column(4,
+                        shiny::column(3,
                             shiny::conditionalPanel(
                                 condition = "input.filters.includes('filter_blk')",  # JS expression
+                                # filter_blk_threshold = 0.8,
                                 shiny::numericInput("filter_blk_threshold",
                                                     "Minimum blank ratio",
                                                     value = 0.8,
                                                     min = 0,
                                                     max = 1,
-                                                    step = 0.05)
+                                                    step = 0.05),
+                                # filter_blk_ghost_peaks = TRUE,
+                                shiny::checkboxInput("filter_blk_ghost_peaks",
+                                                     "Delete ghost peaks?",
+                                                     value = TRUE)
                             )
                         ),
-                        #                   filter_rsd_threshold = 30,
-                        shiny::column(4,
-                            shiny::conditionalPanel(
-                                condition = "input.filters.includes('filter_rsd')",  # JS expression
-                                shiny::numericInput("filter_rsd_threshold",
-                                                    "Maximum RSD",
-                                                    value = 30,
-                                                    min = 0,
-                                                    max = 100,
-                                                    step = 5)
-                            )
+                        # filter_rsd_threshold = 30,
+                        shiny::column(3,
+                                      shiny::conditionalPanel(
+                                          condition = "input.filters.includes('filter_rsd')",  # JS expression
+                                          shiny::numericInput("filter_rsd_threshold",
+                                                              "Maximum RSD",
+                                                              value = 30,
+                                                              min = 0,
+                                                              max = 100,
+                                                              step = 5)
+                                      )
+                        ),
+                        # filter_rmd_range = c(50, 3000),
+                        shiny::column(3,
+                                      shiny::conditionalPanel(
+                                          condition = "input.filters.includes('filter_rmd')",  # JS expression
+                                          shiny::numericInput("filter_rmd_range_min",
+                                                              "Minimum RMD",
+                                                              value = 50,
+                                                              min = 0,
+                                                              max = 5000,
+                                                              step = 5),
+                                          shiny::numericInput("filter_rmd_range_max",
+                                                              "Maximum RMD",
+                                                              value = 3000,
+                                                              min = 5000,
+                                                              max = 10000,
+                                                              step = 5)
+                                      )
                         )
                     ),
                     shiny::hr(),
@@ -206,7 +238,7 @@ runGUI <- function() {
                                 condition = "input.compute_pearson_correlation",
                                 shiny::selectInput("pearson_p_value",
                                                    "Maximum p-value",
-                                                   c("No filtering", 0.05, 0.01),
+                                                   c("No filtering"=1, 0.05, 0.01),
                                                    multiple = FALSE,
                                                    selected = 0.05)
                             )
@@ -349,6 +381,90 @@ runGUI <- function() {
             ),
 
 
+            # shiny::tabPanel(
+            #     "PDA / CAD",
+            #
+            #     shiny::sidebarPanel(
+            #         shiny::h6("Clean CAD/PDA peaks based on manually extracted data and joins them with the annotated MS data."),
+            #         shiny::br(),
+            #         shiny::h5("Start row"),
+            #         "The row number of the start of the CAD/PDA RT and intensities in your manually extracted file.",
+            #         shiny::h5("RT delta"),
+            #         "Positive or negative value indicating the difference in RT between the CAD/PDA peaks and MS peaks.",
+            #         shiny::h5("RT threshold"),
+            #         "The difference in RT between the CAD/PDA peaks and MS peaks tolerated to join them.",
+            #         shiny::h5("Pearson correlation and p-value thresholds."),
+            #         "Links having a too low or a non-significative Pearson correlation will be ignored."
+            #     ),
+            #
+            #     shiny::mainPanel(
+            #         warning_wd(),
+            #         shiny::selectInput("mode",
+            #                            shiny::h5("Mode"),
+            #                            c("CAD", "PDA"),
+            #                            multiple = FALSE,
+            #                            selected = "CAD",
+            #                            width = "100%"),
+            #         shiny::br(),
+            #         shiny::column(4,
+            #             # clean_cad_pda_peaks("PDA", data_start_row = 5, plot_spectra = FALSE, plot_ROI = FALSE)
+            #             shiny::h5("Clean peaks"),
+            #             shiny::numericInput("data_start_row",
+            #                                 "Start row",
+            #                                 value = 5,
+            #                                 min = 1,
+            #                                 step = 1),
+            #             shiny::checkboxInput("plot_spectra",
+            #                                  "Export spectra plot?",
+            #                                  value = FALSE),
+            #             shiny::checkboxInput("plot_ROI",
+            #                                  "Export ROI plot?",
+            #                                  value = FALSE),
+            #             mainButton("button_cad_clean", "Launch cleaning"),
+            #             shiny::verbatimTextOutput("cad_clean")
+            #         ),
+            #         shiny::column(8,
+            #             shiny::h5("Merge with MS peaks"),
+            #             shiny::fluidRow(
+            #                 shiny::column(6,
+            #                     shiny::numericInput("delta_rt",
+            #                                         "RT delta",
+            #                                         value = 0,
+            #                                         step = 0.01),
+            #                     shiny::helpText("RT(CAD/PDA) + RT_delta = RT(MS)")
+            #                 ),
+            #                 shiny::column(6,
+            #                     shiny::numericInput("cad_threshold_rt",
+            #                                         "RT threshold",
+            #                                         value = 0.05,
+            #                                         min = 0,
+            #                                         step = 0.01)
+            #                 )
+            #             ),
+            #             shiny::fluidRow(
+            #                 shiny::column(6,
+            #                     shiny::numericInput("cad_pearson_correlation_threshold",
+            #                                         "Minimum Pearson correlation",
+            #                                         value = 0.8,
+            #                                         min = 0,
+            #                                         max = 1,
+            #                                         step = 0.05)
+            #                 ),
+            #                 shiny::column(6,
+            #                     shiny::selectInput("cad_pearson_p_value",
+            #                                        "Maximum Pearson p-value",
+            #                                        c("No filtering"=1, 0.05, 0.01),
+            #                                        multiple = FALSE,
+            #                                        selected = 0.05)
+            #                 )
+            #             ),
+            #             mainButton("button_cad_merge", "Launch merging"),
+            #             shiny::verbatimTextOutput("cad_merge")
+            #         )
+            #     )
+            # ),
+
+
             shiny::tabPanel(
                 "Datasets",
 
@@ -393,6 +509,8 @@ runGUI <- function() {
                 shinyjs::disable("button_keep")
                 shinyjs::disable("button_launch")
                 shinyjs::disable("button_convert")
+                shinyjs::disable("button_cad_clean")
+                shinyjs::disable("button_cad_merge")
             } else {
                 path <- shinyFiles::parseDirPath(volumes, input$project_directory)
                 assign("analysis_directory", path, envir = mscleanrCache)
@@ -401,6 +519,8 @@ runGUI <- function() {
                 shinyjs::enable("button_keep")
                 shinyjs::enable("button_launch")
                 shinyjs::enable("button_convert")
+                shinyjs::enable("button_cad_clean")
+                shinyjs::enable("button_cad_merge")
             }
         })
 
@@ -441,9 +561,12 @@ runGUI <- function() {
             list(
                 filter_blk                    = "filter_blk" %in% input$filters,
                 filter_blk_threshold          = input$filter_blk_threshold,
+                filter_blk_ghost_peaks        = input$filter_blk_ghost_peaks,
                 filter_mz                     = "filter_mz" %in% input$filters,
                 filter_rsd                    = "filter_rsd" %in% input$filters,
                 filter_rsd_threshold          = input$filter_rsd_threshold,
+                filter_rmd                    = "filter_rmd" %in% input$filters,
+                filter_rmd_range              = c(input$filter_rmd_range_min, input$filter_rmd_range_max),
                 threshold_mz                  = input$threshold_mz,
                 threshold_rt                  = input$threshold_rt,
                 compute_pearson_correlation   = input$compute_pearson_correlation,
@@ -563,6 +686,48 @@ runGUI <- function() {
                 finally = waiter$hide()
             )
         })
+
+
+        # CAD/PDA
+        cad_clean_params <- shiny::eventReactive(input$button_cad_clean, {
+             list(mode           = input$mode,
+                  data_start_row = input$data_start_row,
+                  plot_spectra   = input$plot_spectra,
+                  plot_ROI       = input$plot_ROI)
+            })
+
+        output$cad_clean <- shiny::renderPrint({
+            shiny::req(input$button_cad_clean > 0)
+            shiny::req(exists("analysis_directory", envir = mscleanrCache))
+            shiny::req(cad_clean_params())
+            waiter <- fun_waiter(paste("Cleaning", cad_clean_params()$mode, "peaks..."))
+            waiter$show()
+            tryCatch(
+                do.call(clean_cad_pda_peaks, cad_clean_params()),
+                finally = waiter$hide()
+            )
+        })
+
+        cad_merge_params <- shiny::eventReactive(input$button_cad_merge, {
+            list(mode                          = input$mode,
+                 delta_rt                      = input$delta_rt,
+                 threshold_rt                  = input$cad_threshold_rt,
+                 pearson_correlation_threshold = input$cad_pearson_correlation_threshold,
+                 pearson_p_value               = input$cad_pearson_p_value)
+        })
+
+        output$cad_merge <- shiny::renderPrint({
+            shiny::req(input$button_cad_merge > 0)
+            shiny::req(exists("analysis_directory", envir = mscleanrCache))
+            shiny::req(cad_merge_params())
+            waiter <- fun_waiter(paste("Merging", cad_merge_params()$mode, "and MS peaks..."))
+            waiter$show()
+            tryCatch(
+                do.call(launch_cad_fusion, cad_merge_params()),
+                finally = waiter$hide()
+            )
+        })
+
 
         # Datasets
         output$adducts_pos <- shiny::renderDataTable(mass_adducts_pos,      escape = FALSE, options = list(pageLength = 10))
