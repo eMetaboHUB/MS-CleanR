@@ -2,6 +2,7 @@
 
 export(choose_project_directory)
 export(clean_msdial_data)
+export(concat_msp_files)
 export(convert_csv_to_msp)
 export(keep_top_peaks)
 export(launch_msfinder_annotation)

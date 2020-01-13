@@ -4,10 +4,12 @@
 \alias{convert_csv_to_msp}
 \title{Convert the final CSV file post annotations to MSP format.}
 \usage{
-convert_csv_to_msp(min_score = 20)
+convert_csv_to_msp(all = FALSE, min_score = 20)
 }
 \arguments{
-\item{min_score}{Peaks must have a final score >= \code{min_score} to be exported to the MSP files.}
+\item{all}{All peaks are exported to the MSP files.}
+
+\item{min_score}{If \code{all} is \code{FALSE}, peaks must have a final score >= \code{min_score} to be exported to the MSP files.}
 }
 \description{
 Convert the final CSV file post annotations to MSP format.

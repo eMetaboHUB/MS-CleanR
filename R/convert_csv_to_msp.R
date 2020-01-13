@@ -1,9 +1,10 @@
 
 #' Convert the final CSV file post annotations to MSP format.
 #'
-#' @param min_score Peaks must have a final score >= \code{min_score} to be exported to the MSP files.
+#' @param all All peaks are exported to the MSP files.
+#' @param min_score If \code{all} is \code{FALSE}, peaks must have a final score >= \code{min_score} to be exported to the MSP files.
 #' @export
-convert_csv_to_msp <- function(min_score = 20) {
+convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
     check_for_convert_csv_to_msp(min_score)
 
     csv_data <- import_data("annotated_data-normalized")
@@ -11,10 +12,14 @@ convert_csv_to_msp <- function(min_score = 20) {
 
     mandatory <- c("Structure", "Formula", "source", "Average.Rt.min.", "PRECURSORMZ", "PRECURSORTYPE", "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")
     # optional <- c("Ontology", "Classyfire_subclass", "level", "Compound_level", "Internal_id")
-    csv_data <- csv_data[csv_data$annotation_result != "Unknown compound"
-                         & is.na(csv_data$annotation_warning)
-                         & csv_data$Final.score >= min_score,
-                         mandatory]
+    if (all) {
+        csv_data <- csv_data[mandatory]
+    } else {
+        csv_data <- csv_data[csv_data$annotation_result != "Unknown compound"
+                             & is.na(csv_data$annotation_warning)
+                             & csv_data$Final.score >= min_score,
+                             mandatory]
+    }
     print_message(nrow(csv_data), " peaks to convert in MSP.")
 
     if (nrow(csv_data) > 0) {

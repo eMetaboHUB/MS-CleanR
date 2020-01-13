@@ -132,3 +132,24 @@ get_confirmation_for_overwriting <- function(path) {
 }
 
 
+
+#' Concatenate all MSP files present in the folder at \code{path}.
+#'
+#' @param path The path of the folder containing MSP files to concatenate.
+#' @param output_file The name of the concatenated file.
+#'
+#' @export
+concat_msp_files <- function(path, output_file = "_all_.msp") {
+    if (!file.exists(path)) stop_script("Cannot find ", path)
+    files <- list.files(path = path, pattern = "\\.msp$")
+    if (length(files) > 0) {
+        output_conn <- file(file.path(path, output_file), open = "a")
+        for (input_f in files) {
+            text <- readLines(file.path(path, input_f))
+            writeLines(text, output_conn)
+        }
+        close(output_conn)
+    }
+    print_message(length(files), "MSP files concatenated in", file.path(path, output_file))
+}
+

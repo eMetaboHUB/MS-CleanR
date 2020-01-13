@@ -370,10 +370,16 @@ runGUI <- function() {
 
                 shiny::mainPanel(
                     warning_wd(),
-                    shiny::numericInput("min_score",
-                                        "Minimum score to convert peak to MSP",
-                                        value = 10,
-                                        min = 0),
+                    shiny::checkboxInput("all",
+                                         "Export all peaks to MSP files?",
+                                         value = TRUE),
+                    shiny::conditionalPanel(
+                        condition = "!input.all",
+                        shiny::numericInput("min_score",
+                                            "Minimum score to convert peak to MSP",
+                                            value = 10,
+                                            min = 0)
+                    ),
 
                     mainButton("button_convert", "Convert peaks to MSP files"),
                     shiny::verbatimTextOutput("convert")
@@ -673,7 +679,8 @@ runGUI <- function() {
 
 
         # convert_csv_to_msp
-        convert_params <- shiny::eventReactive(input$button_convert, list(min_score = input$min_score))
+        convert_params <- shiny::eventReactive(input$button_convert, list(all = input$all,
+                                                                          min_score = input$min_score))
 
         output$convert <- shiny::renderPrint({
             shiny::req(input$button_convert > 0)
