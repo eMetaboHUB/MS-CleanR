@@ -138,7 +138,10 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
 
     # Clusters with a pair [M+H]+ / [M-H]-
     print_message("*** Annotating clusters with [M+H]+ / [M-H]- couples ***")
-    m_pairs <- final_links[final_links$Adduct.1 %in% c("[M+H]+", "[M-H]-") & final_links$Adduct.2 %in% c("[M+H]+", "[M-H]-"),]
+    m_pairs <- final_links[final_links$Adduct.1 %in% c("[M+H]+", "[M-H]-")
+                           & final_links$Adduct.2 %in% c("[M+H]+", "[M-H]-")
+                           & final_links$Adduct.1 != final_links$Adduct.2,]
+    m_pairs <- unique(m_pairs[c("CpdID.1", "CpdID.2", "cluster.1", "cluster.2", "Mass.1", "Mass.2")])
     m_pairs <- m_pairs[m_pairs$CpdID.1 %in% final_data$id & m_pairs$CpdID.2 %in% final_data$id,]
     m_pairs <- m_pairs[m_pairs$cluster.1 == m_pairs$cluster.2 & !is.na(m_pairs$cluster.1),]
     freq <- dplyr::count(m_pairs, .data$cluster.1)
@@ -153,8 +156,8 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
 
     # Clusters with several pairs [M+H]+ / [M-H]-, we only consider the pair having the highest mass
     for(cluster_id in freq[freq$n > 1,]$cluster.1) {
-        ids_1 <- unlist(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.1)
-        ids_2 <- unlist(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.2)
+        ids_1 <- unique(unlist(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.1))
+        ids_2 <- unique(unlist(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.2))
         max_mass <- max(final_data[final_data$id %in% c(ids_1, ids_2),]$Average.Mz)
         couple_max <- m_pairs[m_pairs$cluster.1 == cluster_id & (m_pairs$Mass.1 == max_mass | m_pairs$Mass.2 == max_mass),]
         if(length(couple_max$CpdID.1) == 1) {
