@@ -10,7 +10,7 @@ convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
     csv_data <- import_data("annotated_data-normalized")
     samples <- import_data("samples")
 
-    mandatory <- c("Structure", "Formula", "source", "Average.Rt.min.", "PRECURSORMZ", "PRECURSORTYPE", "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")
+    mandatory <- c("Structure", "Formula", "source", "Average.Rt.min.", "Average.Mz", "Adduct.type", "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")
     # optional <- c("Ontology", "Classyfire_subclass", "level", "Compound_level", "Internal_id")
     if (all) {
         csv_data <- csv_data[mandatory]
@@ -25,9 +25,11 @@ convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
     if (nrow(csv_data) > 0) {
         # Name en 1er
         names(csv_data) <- toupper(names(csv_data))
-        names(csv_data)[names(csv_data) == "STRUCTURE"] <- "NAME"
+        names(csv_data)[names(csv_data) == "STRUCTURE"]       <- "NAME"
         names(csv_data)[names(csv_data) == "AVERAGE.RT.MIN."] <- "RETENTIONTIME"
-        names(csv_data)[names(csv_data) == "SOURCE"] <- "IONMODE"
+        names(csv_data)[names(csv_data) == "AVERAGE.MZ"]      <- "PRECURSORMZ"
+        names(csv_data)[names(csv_data) == "ADDUCT.TYPE"]     <- "PRECURSORTYPE"
+        names(csv_data)[names(csv_data) == "SOURCE"]          <- "IONMODE"
         csv_data[csv_data$IONMODE == "neg", "IONMODE"] <- "Negative"
         csv_data[csv_data$IONMODE == "pos", "IONMODE"] <- "Positive"
 
