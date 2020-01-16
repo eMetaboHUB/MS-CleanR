@@ -209,7 +209,7 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     }
 
     final_annotations <- identifying_data[which(identifying_data$annotation),]
-    export_data(final_annotations[!names(final_annotations) %in% c("annotation", "id", "rank.formula",
+    export_data(final_annotations[!names(final_annotations) %in% c("annotation", "rank.formula",
                                                                    "rank.structure", "cluster", "cluster.size")],
                 "annotated_data-cleaned",
                 empty_na = TRUE)
@@ -219,9 +219,9 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     final_annotations[samples$Column_name] <- scale(final_annotations[samples$Column_name],
                                                     center=FALSE,
                                                     scale=colSums(final_annotations[samples$Column_name]))
-    final_annotations[samples$Column_name] <- round(final_annotations[samples$Column_name] * 1000, 2)
+    final_annotations[samples$Column_name] <- round(final_annotations[samples$Column_name] * 1000, 4)
 
-    export_data(final_annotations[!names(final_annotations) %in% c("annotation", "id", "rank.formula",
+    export_data(final_annotations[!names(final_annotations) %in% c("annotation", "rank.formula",
                                                                    "rank.structure", "cluster", "cluster.size")],
                 "annotated_data-normalized",
                 empty_na = TRUE)
