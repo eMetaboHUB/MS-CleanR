@@ -8,7 +8,7 @@ check_architecture_for_clean_msdial_data <- function(filter_blk) {
     clean_for_current_run("final_folder", create_dir = TRUE)
     clean_for_current_run("inter_folder", create_dir = TRUE)
 
-    for (source in c("pos", "neg")) {
+    for (source in get("analysis_modes", envir = mscleanrCache)) {
         check_path("normalized_ms_data",
                    source = source,
                    na_msg = paste0("Can't find normalized MS data for ", source, " mode."))
@@ -30,7 +30,7 @@ check_architecture_for_keep_top_peaks <- function(export_filtered_peaks) {
     check_path("samples")
     check_path("final_adducts_data")
     if (export_filtered_peaks) {
-        for (source in c("pos", "neg")) {
+        for (source in get("analysis_modes", envir = mscleanrCache)) {
             check_path("msdial_peaks", source = source)
             clean_for_current_run("msdial_filtered_peaks", source = source, create_dir = TRUE)
         }
@@ -56,7 +56,7 @@ check_architecture_for_launch_msfinder_annotation <- function(msfinder_biosoc_le
 
     if (length(msfinder_biosoc_levels) == 0) print_warning("No levels provided for MSFinder annotation, only 'generic' will be used.")
 
-    for (source in c("pos", "neg")) {
+    for (source in get("analysis_modes", envir = mscleanrCache)) {
         for (info in c("Formula", "Structure")) {
             for (lvl in c(msfinder_biosoc_levels, "generic")) {
                 check_path("msfinder_data", source = source, msfinder_info = info, msfinder_lvl = lvl,
@@ -72,14 +72,17 @@ check_architecture_for_launch_msfinder_annotation <- function(msfinder_biosoc_le
 #' Check the project main architecture
 #'
 #' @param posneg Whether to check the existence of pos/neg directories.
-check_main_architecture <- function(posneg = TRUE) {
+check_main_architecture <- function(posneg_check = TRUE) {
     if (!exists("analysis_directory", envir = mscleanrCache)) {
         stop_script("No project directory chosen. Please do so with choose_project_directory().")
     }
     check_path(filetype = NULL, na_msg = "Project directory can't be NA.")
-    if (posneg) {
-        check_path("source_folder", source = "pos")
-        check_path("source_folder", source = "neg")
+    if (posneg_check) {
+        modes <- c()
+        if (check_path("source_folder", source = "pos", stop = FALSE)) modes <- c(modes, "pos")
+        if (check_path("source_folder", source = "neg", stop = FALSE)) modes <- c(modes, "neg")
+        if (length(modes) == 0) stop_script("A pos or a neg directory must be present.")
+        assign("analysis_modes", modes, envir = mscleanrCache)
     }
 }
 
@@ -215,8 +218,12 @@ check_path <- function(filetype, stop = TRUE, na_msg = NA, ...) {
         if (!file.exists(path)) stop_script("Cannot find ", path)
     } else {
              if (is.na(path))        print_warning(na_msg)
-        else if (!file.exists(path)) print_warning("Cannot find ", path)  # file.exists(NA) causes an exception
+        else if (!file.exists(path)) {
+            print_warning("Cannot find ", path)  # file.exists(NA) causes an exception
+            return(FALSE)
+        }
     }
+    return(TRUE)
 }
 
 

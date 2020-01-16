@@ -122,7 +122,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
     # PEARSON (separated pos/neg)
     if (compute_pearson_correlation) {
         cor_links <- data.frame()
-        for (source in c("pos", "neg")) {
+        for (source in get("analysis_modes", envir = mscleanrCache)) {
             tmp_peak_data <- msdial_peak_data[msdial_peak_data$source == source, samples$Column_name]
             if(nrow(samples) < 5) {
                 print_warning("Less than 5 samples used, correlation links will not be as robust.")

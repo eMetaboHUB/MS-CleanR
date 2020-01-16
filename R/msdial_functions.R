@@ -40,26 +40,46 @@ import_msdial_data <- function(filter_blk,
                                filter_rmd,
                                filter_rmd_range,
                                threshold_mz) {
-    samples <- get_samples_info(source = "pos")
-    if (nrow(samples) == 0 | !("Blank" %in% samples$Filetype)) samples <- get_samples_info(source = "neg")
+    analysis_modes <- get("analysis_modes", envir = mscleanrCache)
+    samples <- get_samples_info(source = get("analysis_modes", envir = mscleanrCache)[1])
+    # If samples names are incorrect and we have another mode of analysis available
+    if ((nrow(samples) == 0 | !("Blank" %in% samples$Filetype)) & length(get("analysis_modes", envir = mscleanrCache)) == 2) {
+        samples <- get_samples_info(source = get("analysis_modes", envir = mscleanrCache)[2])
+    }
     if (nrow(samples) == 0) stop_script("Couldn't extract samples information from MSDial files.")
     if (!"Blank" %in% samples$Filetype) stop_script("Can't process data without blanks.")
 
-    msdial_pos <- import_msdial_file("pos", samples)
-    msdial_neg <- import_msdial_file("neg", samples)
-    peak_data <- rbind(msdial_pos, msdial_neg)
+    if ("pos" %in% analysis_modes) {
+        msdial_pos <- import_msdial_file("pos", samples)
+        msdial_pos_links <- extract_msdial_links(msdial_pos[c("Alignment.ID", "id", "Adduct.type", "Post.curation.result")])
+        if (filter_blk) height_pos <- import_msdial_file("pos", samples, normalized = FALSE)
+    }
+    if ("neg" %in% analysis_modes) {
+        msdial_neg <- import_msdial_file("neg", samples)
+        msdial_neg_links <- extract_msdial_links(msdial_neg[c("Alignment.ID", "id", "Adduct.type", "Post.curation.result")])
+        if (filter_blk) height_neg <- import_msdial_file("neg", samples, normalized = FALSE)
+    }
+    if ("pos" %in% analysis_modes & "neg" %in% analysis_modes) {
+        peak_data <- rbind(msdial_pos, msdial_neg)
+        links     <- rbind(msdial_pos_links, msdial_neg_links)
+        if (filter_blk) height_data <- rbind(height_pos, height_neg)
+    } else {
+        if ("pos" %in% analysis_modes) {
+            peak_data <- msdial_pos
+            links     <- msdial_pos_links
+            if (filter_blk) height_data <- height_pos
+        } else {
+            peak_data <- msdial_neg
+            links     <- msdial_neg_links
+            if (filter_blk) height_data <- height_neg
+        }
+    }
     peak_data <- peak_data[peak_data$MS.MS.assigned != "False",]  # We work only on rows with MS/MS
     peak_data$MS.MS.assigned <- NULL
-
-    msdial_pos_links <- extract_msdial_links(msdial_pos[c("Alignment.ID", "id", "Adduct.type", "Post.curation.result")])
-    msdial_neg_links <- extract_msdial_links(msdial_neg[c("Alignment.ID", "id", "Adduct.type", "Post.curation.result")])
-    links <- clear_duplicate_links(rbind(msdial_pos_links, msdial_neg_links))
+    links <- clear_duplicate_links(links)
 
     # filters
-    if (filter_blk) {
-        # on Height data
-        height_data <- rbind(import_msdial_file("pos", samples, normalized = FALSE),
-                             import_msdial_file("neg", samples, normalized = FALSE))
+    if (filter_blk) {  # on Height data
         # ratio Blank
              if("QC"       %in% samples$Script_class) height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_QC
         else if("Standard" %in% samples$Script_class) height_data$ratio_Blank <- height_data$avg_Blank / height_data$avg_Standard
@@ -127,8 +147,8 @@ import_msdial_data <- function(filter_blk,
                                              id     = detected_adducts$id.2,
                                              adduct = as.character(detected_adducts$Adduct.type.2)))
 
-        if(!"[M+H]+" %in% detected_adducts$adduct) stop_script("[M+H]+ not found.")
-        if(!"[M-H]-" %in% detected_adducts$adduct) stop_script("[M-H]- not found.")
+        if("pos" %in% analysis_modes & !"[M+H]+" %in% detected_adducts$adduct) stop_script("[M+H]+ not found.")
+        if("neg" %in% analysis_modes & !"[M-H]-" %in% detected_adducts$adduct) stop_script("[M-H]- not found.")
 
         detected_adducts <- unique(detected_adducts)
         detected_adducts <- detected_adducts %>% dplyr::group_by(source, .data$adduct) %>% dplyr::summarise(n = dplyr::n())

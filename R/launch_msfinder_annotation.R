@@ -63,7 +63,7 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
 
     # Merging all MSFinder files
     msfinder_data <- data.frame()
-    for(source in c("pos", "neg")) {
+    for(source in get("analysis_modes", envir = mscleanrCache)) {
         for(level in c(biosoc_levels, "generic")) {
             suppressWarnings(
                 msf_tmp <- import_msfinder_data(source, level)
