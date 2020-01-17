@@ -1,7 +1,7 @@
 
 #' Annotates peaks based on files extracted from MSFinder.
 #'
-#' @eval recurrent_params("compound_levels", "biosoc_levels")
+#' @eval recurrent_params("compound_levels", "biosoc_levels", "score_only")
 #' @param levels_scores A list of levels names and their corresponding multiplier to adapt final annotation scores.
 #'
 #' @section Architecture needed by launch_msfinder_annotation in the project_directory:
@@ -45,8 +45,9 @@
 #'
 #' @export
 launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
-                                       biosoc_levels = c("generic"),
-                                       levels_scores = NULL) {
+                                       biosoc_levels   = c("generic"),
+                                       levels_scores   = NULL,
+                                       score_only      = FALSE) {
 
     check_input_parameters_launch_msfinder(biosoc_levels, compound_levels, levels_scores)
     check_architecture_for_launch_msfinder_annotation(biosoc_levels)
@@ -119,23 +120,6 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     identifying_data$annotation_result  <- NA
     identifying_data$annotation_warning <- NA
 
-    # Clusters of size 1 or 2 without identification and with links: Ignored
-    # print_message("*** Ignoring small clusters without identification and with links ***")
-    # for(ignored_size in c(1, 2)) {
-    #     small_clusters <- dplyr::count(identifying_data[identifying_data$cluster.size == ignored_size
-    #                                                     & is.na(identifying_data$level),],
-    #                                    .data$cluster)
-    #     for(cluster_id in small_clusters[small_clusters$n == ignored_size,]$cluster) {
-    #         cluster_links <- final_links[   final_links$simple.nature != "found in higher mz's MsMs"
-    #                                      &  final_links$simple.nature != "similar chromatogram in higher mz"
-    #                                      & (final_links$cluster.1 == cluster_id | final_links$cluster.2 == cluster_id)
-    #                                      &  final_links$cluster.2 != final_links$cluster.1,]
-    #         if(nrow(cluster_links) > 0) {
-    #             identifying_data[identifying_data$cluster == cluster_id,]$annotation_result <- "Ignored"
-    #         }
-    #     }
-    # }
-
     # Clusters with a pair [M+H]+ / [M-H]-
     print_message("*** Annotating clusters with [M+H]+ / [M-H]- couples ***")
     m_pairs <- final_links[final_links$Adduct.1 %in% c("[M+H]+", "[M-H]-")
@@ -151,7 +135,8 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
                                              couple_ids = c(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.1,
                                                             m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.2),
                                              compound_levels = compound_levels,
-                                             biosoc_levels = biosoc_levels)
+                                             biosoc_levels   = biosoc_levels,
+                                             score_only      = score_only)
     }
 
     # Clusters with several pairs [M+H]+ / [M-H]-, we only consider the pair having the highest mass
@@ -163,16 +148,18 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
         if(length(couple_max$CpdID.1) == 1) {
             identifying_data <- annotate_cluster(identifying_data,
                                                  cluster_id,
-                                                 couple_ids = c(couple_max$CpdID.1, couple_max$CpdID.2),
+                                                 couple_ids      = c(couple_max$CpdID.1, couple_max$CpdID.2),
                                                  compound_levels = compound_levels,
-                                                 biosoc_levels = biosoc_levels)
+                                                 biosoc_levels   = biosoc_levels,
+                                                 score_only      = score_only)
         } else {
             # If several pairs with highest mass, we consider all peaks in these pairs
             identifying_data <- annotate_cluster(identifying_data,
                                                  cluster_id,
-                                                 couple_ids = c(ids_1, ids_2),
+                                                 couple_ids      = c(ids_1, ids_2),
                                                  compound_levels = compound_levels,
-                                                 biosoc_levels = biosoc_levels)
+                                                 biosoc_levels   = biosoc_levels,
+                                                 score_only      = score_only)
         }
     }
 
@@ -182,22 +169,29 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
         identifying_data <- annotate_cluster(identifying_data,
                                              cluster_id,
                                              compound_levels = compound_levels,
-                                             biosoc_levels = biosoc_levels)
+                                             biosoc_levels   = biosoc_levels,
+                                             score_only      = score_only)
     }
 
 
     # Adapting scores
-    identifying_data$Final.score <- as.numeric(identifying_data$Total.score)
-    for (level in names(levels_scores)) identifying_data <- update_annotations_scores(identifying_data, level, levels_scores[[level]])
+    if (!score_only) {
+        identifying_data$Final.score <- as.numeric(identifying_data$Total.score)
+        for (level in names(levels_scores)) identifying_data <- update_annotations_scores(identifying_data, level, levels_scores[[level]])
 
-    msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
+        msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
+    }
     identifying_data <- identifying_data[, c(c("annotation_result", "annotation", "annotation_warning"),
                                              msd_main_cols[msd_main_cols != "MS.MS.spectrum"],
                                              msf_main_cols,
                                              msf_other_cols,
                                              samples$Column_name,
                                              "MS.MS.spectrum"),]
-    identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Final.score))),]
+    if (score_only) {
+        identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Total.score))),]
+    } else {
+        identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Final.score))),]
+    }
     export_data(identifying_data, "annotated_data", empty_na = TRUE)
 
 

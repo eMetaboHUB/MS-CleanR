@@ -19,6 +19,9 @@ assign("biosoc_levels",
 assign("compound_levels",
        "A vector containing the compound levels to consider, in the given order.",
        envir = mscleanrDocParams)
+assign("score_only",
+       "Whether to find the most probable annotation on scores only (without using the biosoc_levels and compound_levels)",
+       envir = mscleanrDocParams)
 assign("filetype",
        "A string indicating the needed directory or file.",
        envir = mscleanrDocParams)

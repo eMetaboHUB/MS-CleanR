@@ -1,11 +1,16 @@
 #' Annotate a single cluster
 #'
-#' @eval recurrent_params("compound_levels", "biosoc_levels")
+#' @eval recurrent_params("compound_levels", "biosoc_levels", "score_only")
 #' @param identifying_data A data.frame containing possible identifications.
 #' @param cluster_id A string indicating the cluster id.
 #' @param couple_ids A 2-tuple indicating specific compounds to consider for annotation
 #' @return A data.frame with the selected identification annotated.
-annotate_cluster <- function(identifying_data, cluster_id, couple_ids = NULL, compound_levels = NULL, biosoc_levels = NULL) {
+annotate_cluster <- function(identifying_data,
+                             cluster_id,
+                             couple_ids = NULL,
+                             compound_levels = NULL,
+                             biosoc_levels = NULL,
+                             score_only = FALSE) {
     print_message("Annotating cluster ", cluster_id)
     in_cluster <- identifying_data$cluster == cluster_id
     possibilities <- identifying_data[in_cluster
@@ -39,11 +44,17 @@ annotate_cluster <- function(identifying_data, cluster_id, couple_ids = NULL, co
         if (nrow(common_ids) > 0) {
             # ID identique dans 2 modes
             id_type <- "Double ID"
-            most_probable <- find_structure(common_ids, compound_levels = compound_levels, biosoc_levels = biosoc_levels)
+            most_probable <- find_structure(common_ids,
+                                            compound_levels = compound_levels,
+                                            biosoc_levels   = biosoc_levels,
+                                            score_only      = score_only)
         } else {
             # ID dans un seul mode
             id_type <- "Simple ID"
-            most_probable <- find_structure(rbind(mode_1, mode_2), compound_levels = compound_levels, biosoc_levels = biosoc_levels)
+            most_probable <- find_structure(rbind(mode_1, mode_2),
+                                            compound_levels = compound_levels,
+                                            biosoc_levels   = biosoc_levels,
+                                            score_only      = score_only)
         }
         identifying_data[in_cluster,]$annotation_result <- id_type
 
@@ -63,25 +74,29 @@ annotate_cluster <- function(identifying_data, cluster_id, couple_ids = NULL, co
 
 #' Find the most probable structure by iterating over all possible levels of annotations.
 #'
-#' @eval recurrent_params("possibilities", "compound_levels", "biosoc_levels")
+#' @eval recurrent_params("possibilities", "compound_levels", "biosoc_levels", "score_only")
 #' @return A vector containing the row id(s) of the most probable structure(s).
-find_structure <- function(possibilities, compound_levels = NULL, biosoc_levels = NULL) {
-    # (1) Structures with a compound level
-    for(cat in compound_levels) {
+find_structure <- function(possibilities, score_only = FALSE, compound_levels = NULL, biosoc_levels = NULL) {
+    if (score_only) {
+        return(get_most_probable(possibilities))
+    } else {
+        # (1) Structures with a compound level
+        for(cat in compound_levels) {
+            for(lvl in biosoc_levels) {
+                tmp <- possibilities[possibilities$level == lvl & possibilities$Compound_level == cat,]
+                if(nrow(tmp) > 0) return(get_most_probable(tmp))
+            }
+        }
+
+        # (2) Structures without a compound level
         for(lvl in biosoc_levels) {
-            tmp <- possibilities[possibilities$level == lvl & possibilities$Compound_level == cat,]
+            tmp <- possibilities[possibilities$level == lvl & !(possibilities$Compound_level %in% compound_levels),]
             if(nrow(tmp) > 0) return(get_most_probable(tmp))
         }
-    }
 
-    # (2) Structures without a compound level
-    for(lvl in biosoc_levels) {
-        tmp <- possibilities[possibilities$level == lvl & !(possibilities$Compound_level %in% compound_levels),]
-        if(nrow(tmp) > 0) return(get_most_probable(tmp))
+        # (3) If nothing found in personal databases, searching in last generic level
+        return(get_most_probable(possibilities[possibilities$level == "generic",]))
     }
-
-    # (3) If nothing found in personal databases, searching in last generic level
-    return(get_most_probable(possibilities[possibilities$level == "generic",]))
 }
 
 

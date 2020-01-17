@@ -4,10 +4,10 @@
 \alias{check_main_architecture}
 \title{Check the project main architecture}
 \usage{
-check_main_architecture(posneg = TRUE)
+check_main_architecture(posneg_check = TRUE)
 }
 \arguments{
-\item{posneg}{Whether to check the existence of pos/neg directories.}
+\item{posneg_check}{Whether to check the existence of pos/neg directories.}
 }
 \description{
 Check the project main architecture

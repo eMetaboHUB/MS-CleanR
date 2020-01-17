@@ -4,10 +4,17 @@
 \alias{find_structure}
 \title{Find the most probable structure by iterating over all possible levels of annotations.}
 \usage{
-find_structure(possibilities, compound_levels = NULL, biosoc_levels = NULL)
+find_structure(
+  possibilities,
+  score_only = FALSE,
+  compound_levels = NULL,
+  biosoc_levels = NULL
+)
 }
 \arguments{
 \item{possibilities}{A data.frame of possible structures.}
+
+\item{score_only}{Whether to find the most probable annotation on scores only (without using the biosoc_levels and compound_levels)}
 
 \item{compound_levels}{A vector containing the compound levels to consider, in the given order.}
 

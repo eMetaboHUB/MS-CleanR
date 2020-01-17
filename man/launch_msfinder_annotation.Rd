@@ -7,7 +7,8 @@
 launch_msfinder_annotation(
   compound_levels = NULL,
   biosoc_levels = c("generic"),
-  levels_scores = NULL
+  levels_scores = NULL,
+  score_only = FALSE
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ launch_msfinder_annotation(
 \item{biosoc_levels}{A vector containing the biosource levels to consider, in the given order.}
 
 \item{levels_scores}{A list of levels names and their corresponding multiplier to adapt final annotation scores.}
+
+\item{score_only}{Whether to find the most probable annotation on scores only (without using the biosoc_levels and compound_levels)}
 }
 \description{
 Annotates peaks based on files extracted from MSFinder.

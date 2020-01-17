@@ -9,7 +9,8 @@ annotate_cluster(
   cluster_id,
   couple_ids = NULL,
   compound_levels = NULL,
-  biosoc_levels = NULL
+  biosoc_levels = NULL,
+  score_only = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ annotate_cluster(
 \item{compound_levels}{A vector containing the compound levels to consider, in the given order.}
 
 \item{biosoc_levels}{A vector containing the biosource levels to consider, in the given order.}
+
+\item{score_only}{Whether to find the most probable annotation on scores only (without using the biosoc_levels and compound_levels)}
 }
 \value{
 A data.frame with the selected identification annotated.
