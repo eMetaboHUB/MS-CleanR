@@ -338,19 +338,27 @@ runGUI <- function() {
 
                 shiny::mainPanel(
                     warning_wd(),
-                    # compound_levels = c("1a", "1b"),
-                    levelsInput("compound_levels",
-                                "compound levels in your annotation files",
-                                "direct,extension,..."),
-                    # biosoc_levels = c("genre", "family"),
-                    levelsInput("biosoc_levels",
-                                "biosource levels in your annotation process",
-                                "genus,family,...",
-                                blank_if_none = FALSE),
-                    # levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
-                    levelsInput("levels_scores",
-                                "scores multipliers associated to your compound or biosource levels",
-                                "direct:2,genus:2,family:1.5,..."),
+                    shiny::checkboxInput("score_only",
+                                         "Select the best annotation for each peak based only on MSFINDER scores?",
+                                         value = FALSE,
+                                         width = "90%"),
+                    shiny::br(),
+                    shiny::conditionalPanel(
+                        condition = "!input.score_only",
+                        # compound_levels = c("1a", "1b"),
+                        levelsInput("compound_levels",
+                                    "compound levels in your annotation files",
+                                    "direct,extension,..."),
+                        # biosoc_levels = c("genre", "family"),
+                        levelsInput("biosoc_levels",
+                                    "biosource levels in your annotation process",
+                                    "genus,family,...",
+                                    blank_if_none = FALSE),
+                        # levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
+                        levelsInput("levels_scores",
+                                    "scores multipliers associated to your compound or biosource levels",
+                                    "direct:2,genus:2,family:1.5,...")
+                    ),
 
                     mainButton("button_launch", "Launch MS-FINDER annotation"),
                     shiny::verbatimTextOutput("launch")
@@ -662,7 +670,8 @@ runGUI <- function() {
         launch_params <- shiny::eventReactive(input$button_launch, {
             list(compound_levels = compounds(),
                  biosoc_levels   = biosoc(),
-                 levels_scores   = scores())
+                 levels_scores   = scores(),
+                 score_only     = input$score_only)
         })
 
         output$launch <- shiny::renderPrint({

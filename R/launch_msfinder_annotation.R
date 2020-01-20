@@ -53,6 +53,13 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     check_architecture_for_launch_msfinder_annotation(biosoc_levels)
 
     print_message("*** Treating ", get("analysis_directory", envir = mscleanrCache), " ***")
+    if (score_only) {
+        print_message("Annotating of MSFINDER scores only.")
+    } else {
+        print_message("Annotating with", length(compound_levels), "compound levels (", compound_levels,
+                      ") and", length(biosoc_levels), "biosource levels (", biosoc_levels, ").")
+    }
+
     samples     <- import_data("samples")
     final_data  <- import_data("final_peaks_data")
     final_links <- import_data("links_ms_final")
