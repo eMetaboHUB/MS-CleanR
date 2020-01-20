@@ -57,14 +57,18 @@ convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
 dataframe_row_to_txt <- function(df_row) {
     output <- ""
     for (n in names(df_row)[!names(df_row) %in% c("MSMS.COUNT", "MS.MS.SPECTRUM")]) {
-        if (!is.na(df_row[1, n]) & !is.null(df_row[1, n]) & df_row[1, n] != "") {
+        if (!is.na(df_row[1,n]) & !is.null(df_row[1, n]) & df_row[1, n] != "") {
             output <- paste0(output, n, ": ", as.character(df_row[1, n]), "\n")
+        } else {
+            output <- paste0(output, n, ": NA\n")
         }
     }
+    msms_peaks <- strsplit(df_row$MS.MS.SPECTRUM, " ")
     output <- paste0(output,
                      "MSTYPE: MS2\n",
-                     "Num Peaks: ", as.character(df_row[1, "MSMS.COUNT"]), "\n")
-    for (msms in strsplit(df_row$MS.MS.SPECTRUM, " ")) {
+                     "Num Peaks: ", length(msms_peaks[[1]]), "\n")
+    # "Num Peaks: ", as.character(df_row[1, "MSMS.COUNT"]), "\n")
+    for (msms in msms_peaks) {
         for (details in strsplit(msms, ":")) {
             output <- paste0(output, details[1], "\t", details[2], "\n")
         }
