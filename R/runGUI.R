@@ -766,7 +766,7 @@ runGUI <- function() {
 
 
 
-    shiny::runApp(shiny::shinyApp(ui = ui,
-                                  server = server,
-                                  onStart = function() { assign("shiny_running", TRUE, envir = mscleanrCache) }))
+    shiny::shinyApp(ui = ui,
+                    server = server,
+                    onStart = function() { assign("shiny_running", TRUE, envir = mscleanrCache) })
 }
