@@ -27,7 +27,6 @@ Imports:
     dplyr,
     Hmisc,
     gtools,
-    speaq,
     IRanges,
     fuzzyjoin,
     shiny,
