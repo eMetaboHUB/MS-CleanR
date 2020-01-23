@@ -93,13 +93,10 @@ import_msdial_data <- function(filter_blk,
 
         if (filter_blk_ghost_peaks & nrow(blank_peaks) > 0) {
             ghosts <- data.frame(mz = unique(blank_peaks$Average.Mz))
-            ghosts$start_mz <- round((ghosts$mz - threshold_mz / 2) * 10000) # fuzzyjoin needs integer
-            ghosts$end_mz   <- round((ghosts$mz + threshold_mz / 2) * 10000)
-            peak_data$start_mz <- round((peak_data$Average.Mz - threshold_mz / 2) * 10000)
-            peak_data$end_mz   <- round((peak_data$Average.Mz + threshold_mz / 2) * 10000)
-            ghosts <- fuzzyjoin::interval_inner_join(peak_data, ghosts, by = c("start_mz", "end_mz"))
-            peak_data$start_mz <- NULL
-            peak_data$end_mz <- NULL
+            ghosts$round_mz <- round(ghosts$mz, 3)
+            peak_data$round_mz <- round(peak_data$Average.Mz, 3)
+            ghosts <- merge(peak_data, ghosts, by = "round_mz")
+            peak_data$round_mz <- NULL
             export_data(peak_data[peak_data$id %in% unique(ghosts$id),], "deleted_ghosts")
             peak_data <- peak_data[!peak_data$id %in% unique(ghosts$id),]
         }

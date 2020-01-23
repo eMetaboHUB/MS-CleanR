@@ -56,8 +56,15 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     if (score_only) {
         print_message("Annotating of MSFINDER scores only.")
     } else {
-        print_message("Annotating with", length(compound_levels), "compound levels (", compound_levels,
-                      ") and", length(biosoc_levels), "biosource levels (", biosoc_levels, ").")
+        print_message("Annotating with",
+                      length(compound_levels),
+                      "compound levels (",
+                      paste(compound_levels, collapse = ", "),
+                      ") and",
+                      length(biosoc_levels),
+                      "biosource levels (",
+                      paste(biosoc_levels, collapse = ", "),
+                      ").")
     }
 
     samples     <- import_data("samples")
@@ -188,8 +195,8 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
 
         msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
     }
-    identifying_data <- identifying_data[, c(c("annotation_result", "annotation", "annotation_warning"),
-                                             msd_main_cols[msd_main_cols != "MS.MS.spectrum"],
+    identifying_data <- identifying_data[, c(c("id", "annotation_result", "annotation", "annotation_warning"),
+                                             msd_main_cols[!msd_main_cols %in% c("id", "MS.MS.spectrum")],
                                              msf_main_cols,
                                              msf_other_cols,
                                              samples$Column_name,
@@ -210,6 +217,7 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     }
 
     final_annotations <- identifying_data[which(identifying_data$annotation),]
+    # id in 1st position
     export_data(final_annotations[!names(final_annotations) %in% c("annotation", "rank.formula",
                                                                    "rank.structure", "cluster", "cluster.size")],
                 "annotated_data-cleaned",
