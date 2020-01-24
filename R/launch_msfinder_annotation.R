@@ -1,7 +1,7 @@
 
 #' Annotates peaks based on files extracted from MSFinder.
 #'
-#' @eval recurrent_params("compound_levels", "biosoc_levels", "score_only")
+#' @eval recurrent_params("compound_levels", "biosoc_levels", "score_only", "other_peaks_warning")
 #' @param levels_scores A list of levels names and their corresponding multiplier to adapt final annotation scores.
 #'
 #' @section Architecture needed by launch_msfinder_annotation in the project_directory:
@@ -44,10 +44,11 @@
 #' }
 #'
 #' @export
-launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
-                                       biosoc_levels   = c("generic"),
-                                       levels_scores   = NULL,
-                                       score_only      = FALSE) {
+launch_msfinder_annotation <- function(compound_levels     = NULL,  # c() = NULL
+                                       biosoc_levels       = c("generic"),
+                                       levels_scores       = NULL,
+                                       score_only          = FALSE,
+                                       other_peaks_warning = FALSE) {
 
     check_input_parameters_launch_msfinder(biosoc_levels, compound_levels, levels_scores)
     check_architecture_for_launch_msfinder_annotation(biosoc_levels)
@@ -146,11 +147,12 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     for(cluster_id in freq[freq$n == 1,]$cluster.1) {
         identifying_data <- annotate_cluster(identifying_data,
                                              cluster_id,
-                                             couple_ids = c(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.1,
-                                                            m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.2),
-                                             compound_levels = compound_levels,
-                                             biosoc_levels   = biosoc_levels,
-                                             score_only      = score_only)
+                                             couple_ids         = c(m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.1,
+                                                                    m_pairs[m_pairs$cluster.1 == cluster_id,]$CpdID.2),
+                                             compound_levels     = compound_levels,
+                                             biosoc_levels       = biosoc_levels,
+                                             score_only          = score_only,
+                                             other_peaks_warning = other_peaks_warning)
     }
 
     # Clusters with several pairs [M+H]+ / [M-H]-, we only consider the pair having the highest mass
@@ -162,18 +164,20 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
         if(length(couple_max$CpdID.1) == 1) {
             identifying_data <- annotate_cluster(identifying_data,
                                                  cluster_id,
-                                                 couple_ids      = c(couple_max$CpdID.1, couple_max$CpdID.2),
-                                                 compound_levels = compound_levels,
-                                                 biosoc_levels   = biosoc_levels,
-                                                 score_only      = score_only)
+                                                 couple_ids          = c(couple_max$CpdID.1, couple_max$CpdID.2),
+                                                 compound_levels     = compound_levels,
+                                                 biosoc_levels       = biosoc_levels,
+                                                 score_only          = score_only,
+                                                 other_peaks_warning = other_peaks_warning)
         } else {
             # If several pairs with highest mass, we consider all peaks in these pairs
             identifying_data <- annotate_cluster(identifying_data,
                                                  cluster_id,
-                                                 couple_ids      = c(ids_1, ids_2),
-                                                 compound_levels = compound_levels,
-                                                 biosoc_levels   = biosoc_levels,
-                                                 score_only      = score_only)
+                                                 couple_ids          = c(ids_1, ids_2),
+                                                 compound_levels     = compound_levels,
+                                                 biosoc_levels       = biosoc_levels,
+                                                 score_only          = score_only,
+                                                 other_peaks_warning = other_peaks_warning)
         }
     }
 
@@ -182,9 +186,10 @@ launch_msfinder_annotation <- function(compound_levels = NULL,  # c() = NULL
     for(cluster_id in levels(factor(identifying_data[is.na(identifying_data$annotation_result),]$cluster))) {
         identifying_data <- annotate_cluster(identifying_data,
                                              cluster_id,
-                                             compound_levels = compound_levels,
-                                             biosoc_levels   = biosoc_levels,
-                                             score_only      = score_only)
+                                             compound_levels     = compound_levels,
+                                             biosoc_levels       = biosoc_levels,
+                                             score_only          = score_only,
+                                             other_peaks_warning = other_peaks_warning)
     }
 
 

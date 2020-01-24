@@ -1,6 +1,6 @@
 #' Annotate a single cluster
 #'
-#' @eval recurrent_params("compound_levels", "biosoc_levels", "score_only")
+#' @eval recurrent_params("compound_levels", "biosoc_levels", "score_only", "other_peaks_warning")
 #' @param identifying_data A data.frame containing possible identifications.
 #' @param cluster_id A string indicating the cluster id.
 #' @param couple_ids A 2-tuple indicating specific compounds to consider for annotation
@@ -10,7 +10,8 @@ annotate_cluster <- function(identifying_data,
                              couple_ids = NULL,
                              compound_levels = NULL,
                              biosoc_levels = NULL,
-                             score_only = FALSE) {
+                             score_only = FALSE,
+                             other_peaks_warning = FALSE) {
     print_message("Annotating cluster ", cluster_id)
     in_cluster <- identifying_data$cluster == cluster_id
     possibilities <- identifying_data[in_cluster
@@ -65,6 +66,16 @@ annotate_cluster <- function(identifying_data,
             most_probable <- c(most_probable[1])
         }
         identifying_data[identifying_data$rowid %in% most_probable,]$annotation <- TRUE
+    }
+
+    # Adding warning if other annotated peaks possible
+    if (other_peaks_warning) {
+        if (exists("id_type")) {
+            if (  (id_type == "Simple ID" & length(unique(possibilities$id)) > 1)
+                | (id_type == "Double ID" & length(unique(possibilities$id)) > 2)) {
+                identifying_data[in_cluster,]$annotation_warning <- paste0("Other possible annotated peaks for this cluster.")
+            }
+        }
     }
 
     return(identifying_data)

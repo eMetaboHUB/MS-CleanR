@@ -38,7 +38,8 @@ keep_top_peaks(selection_criterion = "both",
 launch_msfinder_annotation(compound_levels = c("1a", "1b"),
                            biosoc_levels = c("genre", "family"),
                            levels_scores = list("1a" = 2, "1b" = 1.5, "genre" = 2, "family" = 1.5),
-                           score_only = FALSE)
+                           score_only = FALSE,
+                           other_peaks_warning = TRUE)
 
 convert_csv_to_msp(all = TRUE, min_score = 5)
 

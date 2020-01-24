@@ -22,6 +22,9 @@ assign("compound_levels",
 assign("score_only",
        "Whether to find the most probable annotation on scores only (without using the biosoc_levels and compound_levels)",
        envir = mscleanrDocParams)
+assign("other_peaks_warning",
+       "Whether to issue a warning if other possible annotated peaks exists in the cluster",
+       envir = mscleanrDocParams)
 assign("filetype",
        "A string indicating the needed directory or file.",
        envir = mscleanrDocParams)

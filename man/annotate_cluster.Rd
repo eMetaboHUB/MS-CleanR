@@ -10,7 +10,8 @@ annotate_cluster(
   couple_ids = NULL,
   compound_levels = NULL,
   biosoc_levels = NULL,
-  score_only = FALSE
+  score_only = FALSE,
+  other_peaks_warning = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ annotate_cluster(
 \item{biosoc_levels}{A vector containing the biosource levels to consider, in the given order.}
 
 \item{score_only}{Whether to find the most probable annotation on scores only (without using the biosoc_levels and compound_levels)}
+
+\item{other_peaks_warning}{Whether to issue a warning if other possible annotated peaks exists in the cluster}
 }
 \value{
 A data.frame with the selected identification annotated.
