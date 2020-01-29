@@ -23,6 +23,10 @@ get_adducts_nl_links <- function(data_to_treat,
     utils::data("mass_isotopes", package="mscleanr", envir=environment())
     mass_isotopes <- get("mass_isotopes", envir=environment())  # redundant, but makes the syntax checker happy
 
+    # change in working directory (bad practice, but MSCombine writes a file in it)
+    old_wd <- getwd()
+    setwd(get("analysis_directory", envir = mscleanrCache))
+
     # pos
     if (is.na(user_pos_neutral_refs)) {
         print_message("Using package neutral losses for positive mode")
@@ -92,6 +96,10 @@ get_adducts_nl_links <- function(data_to_treat,
 
     msc_links$Adduct.1 <- as.character(msc_links$Adduct.1)
     msc_links$Adduct.2 <- as.character(msc_links$Adduct.2)
+
+    # change in working directory (bad practice, but MSCombine writes a file in it)
+    if (file.exists("CommonEntities.csv")) unlink("CommonEntities.csv")
+    setwd(old_wd)
 
     return(list(links             = msc_links,
                 computed_massdiff = all_adducts_posneg,

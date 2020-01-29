@@ -710,44 +710,44 @@ runGUI <- function() {
 
 
         # CAD/PDA
-        cad_clean_params <- shiny::eventReactive(input$button_cad_clean, {
-             list(mode           = input$mode,
-                  data_start_row = input$data_start_row,
-                  plot_spectra   = input$plot_spectra,
-                  plot_ROI       = input$plot_ROI)
-            })
-
-        output$cad_clean <- shiny::renderPrint({
-            shiny::req(input$button_cad_clean > 0)
-            shiny::req(exists("analysis_directory", envir = mscleanrCache))
-            shiny::req(cad_clean_params())
-            waiter <- fun_waiter(paste("Cleaning", cad_clean_params()$mode, "peaks..."))
-            waiter$show()
-            tryCatch(
-                do.call(clean_cad_pda_peaks, cad_clean_params()),
-                finally = waiter$hide()
-            )
-        })
-
-        cad_merge_params <- shiny::eventReactive(input$button_cad_merge, {
-            list(mode                          = input$mode,
-                 delta_rt                      = input$delta_rt,
-                 threshold_rt                  = input$cad_threshold_rt,
-                 pearson_correlation_threshold = input$cad_pearson_correlation_threshold,
-                 pearson_p_value               = input$cad_pearson_p_value)
-        })
-
-        output$cad_merge <- shiny::renderPrint({
-            shiny::req(input$button_cad_merge > 0)
-            shiny::req(exists("analysis_directory", envir = mscleanrCache))
-            shiny::req(cad_merge_params())
-            waiter <- fun_waiter(paste("Merging", cad_merge_params()$mode, "and MS peaks..."))
-            waiter$show()
-            tryCatch(
-                do.call(launch_cad_fusion, cad_merge_params()),
-                finally = waiter$hide()
-            )
-        })
+        # cad_clean_params <- shiny::eventReactive(input$button_cad_clean, {
+        #      list(mode           = input$mode,
+        #           data_start_row = input$data_start_row,
+        #           plot_spectra   = input$plot_spectra,
+        #           plot_ROI       = input$plot_ROI)
+        #     })
+        #
+        # output$cad_clean <- shiny::renderPrint({
+        #     shiny::req(input$button_cad_clean > 0)
+        #     shiny::req(exists("analysis_directory", envir = mscleanrCache))
+        #     shiny::req(cad_clean_params())
+        #     waiter <- fun_waiter(paste("Cleaning", cad_clean_params()$mode, "peaks..."))
+        #     waiter$show()
+        #     tryCatch(
+        #         do.call(clean_cad_pda_peaks, cad_clean_params()),
+        #         finally = waiter$hide()
+        #     )
+        # })
+        #
+        # cad_merge_params <- shiny::eventReactive(input$button_cad_merge, {
+        #     list(mode                          = input$mode,
+        #          delta_rt                      = input$delta_rt,
+        #          threshold_rt                  = input$cad_threshold_rt,
+        #          pearson_correlation_threshold = input$cad_pearson_correlation_threshold,
+        #          pearson_p_value               = input$cad_pearson_p_value)
+        # })
+        #
+        # output$cad_merge <- shiny::renderPrint({
+        #     shiny::req(input$button_cad_merge > 0)
+        #     shiny::req(exists("analysis_directory", envir = mscleanrCache))
+        #     shiny::req(cad_merge_params())
+        #     waiter <- fun_waiter(paste("Merging", cad_merge_params()$mode, "and MS peaks..."))
+        #     waiter$show()
+        #     tryCatch(
+        #         do.call(launch_cad_fusion, cad_merge_params()),
+        #         finally = waiter$hide()
+        #     )
+        # })
 
 
         # Datasets
