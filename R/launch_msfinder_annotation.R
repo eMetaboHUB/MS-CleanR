@@ -194,23 +194,18 @@ launch_msfinder_annotation <- function(compound_levels     = NULL,  # c() = NULL
 
 
     # Adapting scores
+    identifying_data$Final.score <- as.numeric(identifying_data$Total.score)
     if (!score_only) {
-        identifying_data$Final.score <- as.numeric(identifying_data$Total.score)
         for (level in names(levels_scores)) identifying_data <- update_annotations_scores(identifying_data, level, levels_scores[[level]])
-
-        msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
     }
+    msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
     identifying_data <- identifying_data[, c(c("id", "annotation_result", "annotation", "annotation_warning"),
                                              msd_main_cols[!msd_main_cols %in% c("id", "MS.MS.spectrum")],
                                              msf_main_cols,
                                              msf_other_cols,
                                              samples$Column_name,
                                              "MS.MS.spectrum"),]
-    if (score_only) {
-        identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Total.score))),]
-    } else {
-        identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Final.score))),]
-    }
+    identifying_data <- identifying_data[with(identifying_data, order(cluster, Alignment.ID, -xtfrm(Final.score))),]
     export_data(identifying_data, "annotated_data", empty_na = TRUE)
 
 
