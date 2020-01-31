@@ -199,8 +199,8 @@ launch_msfinder_annotation <- function(compound_levels     = NULL,  # c() = NULL
         for (level in names(levels_scores)) identifying_data <- update_annotations_scores(identifying_data, level, levels_scores[[level]])
     }
     msf_main_cols <- c(msf_main_cols, "Final.score")  # adding Final.score
-    identifying_data <- identifying_data[, c(c("id", "annotation_result", "annotation", "annotation_warning"),
-                                             msd_main_cols[!msd_main_cols %in% c("id", "MS.MS.spectrum")],
+    identifying_data <- identifying_data[, c(c("cluster", "id", "annotation_result", "annotation", "annotation_warning"),
+                                             msd_main_cols[!msd_main_cols %in% c("cluster", "id", "MS.MS.spectrum")],
                                              msf_main_cols,
                                              msf_other_cols,
                                              samples$Column_name,
@@ -219,7 +219,7 @@ launch_msfinder_annotation <- function(compound_levels     = NULL,  # c() = NULL
     final_annotations <- identifying_data[which(identifying_data$annotation),]
     # id in 1st position
     export_data(final_annotations[!names(final_annotations) %in% c("annotation", "rank.formula",
-                                                                   "rank.structure", "cluster", "cluster.size")],
+                                                                   "rank.structure", "cluster.size")],
                 "annotated_data-cleaned",
                 empty_na = TRUE)
 
@@ -231,7 +231,7 @@ launch_msfinder_annotation <- function(compound_levels     = NULL,  # c() = NULL
     final_annotations[samples$Column_name] <- round(final_annotations[samples$Column_name] * 1000, 4)
 
     export_data(final_annotations[!names(final_annotations) %in% c("annotation", "rank.formula",
-                                                                   "rank.structure", "cluster", "cluster.size")],
+                                                                   "rank.structure", "cluster.size")],
                 "annotated_data-normalized",
                 empty_na = TRUE)
 
