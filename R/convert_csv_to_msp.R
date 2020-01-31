@@ -7,7 +7,7 @@
 convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
     check_for_convert_csv_to_msp(min_score)
 
-    csv_data <- import_data("annotated_data-normalized")
+    csv_data <- import_data("annotated_data-cleaned")
     samples <- import_data("samples")
 
     mandatory <- c("Structure", "Formula", "source", "Average.Rt.min.", "Average.Mz", "Adduct.type", "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")
