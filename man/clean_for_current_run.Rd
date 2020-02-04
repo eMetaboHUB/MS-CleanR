@@ -4,10 +4,12 @@
 \alias{clean_for_current_run}
 \title{Create a directory or delete a file for a new run.}
 \usage{
-clean_for_current_run(filetype, create_dir = FALSE, ...)
+clean_for_current_run(filetype, delete = TRUE, create_dir = FALSE, ...)
 }
 \arguments{
 \item{filetype}{A string indicating the needed directory or file.}
+
+\item{delete}{A boolean indicating whether the file or directory indicated by the path needs to be deleted.}
 
 \item{create_dir}{A boolean indicating whether the directory indicated by the path needs to be created.}
 

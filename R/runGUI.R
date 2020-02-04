@@ -97,7 +97,16 @@ runGUI <- function() {
                     #                   overwrite = TRUE)
                     shiny::checkboxInput("overwrite",
                                          "Overwrite existing results?",
-                                         value = TRUE)
+                                         value = TRUE),
+                    shiny::br(),
+                    shiny::fluidRow(
+                        shiny::fileInput("parameters",
+                                         paste0("Load saved parameters:"),
+                                         accept = ".csv",
+                                         placeholder = "  No parameters file selected",
+                                         width = "100%"),
+                        shiny::tableOutput("parameters_feedback")
+                    )
                 )
             ),
 
@@ -543,6 +552,100 @@ runGUI <- function() {
         })
 
         shiny::observeEvent(input$overwrite, { assign("overwrite", input$overwrite, envir = mscleanrCache) })
+
+
+        # Parameters
+        shinyjs::runjs("$('#parameters').parent().addClass('btn-sm');")
+        shinyjs::runjs("$('#parameters').parent().parent().parent().parent().parent().addClass('well').addClass('well-sm');")
+
+        output$parameters_feedback <- shiny::renderTable({
+            shiny::req(input$parameters)
+            params <- vroom::vroom(input$parameters$datapath)
+            shiny::validate(shiny::need(ncol(params) == 3 & "PARAMETER" %in% names(params) & "VALUE" %in% names(params),
+                                        "Incorrect parameters file."))
+            params$loaded <- FALSE
+
+            # Ignored: *_refs, Package version
+            params <- params[!endsWith(params$PARAMETER, "_refs") & params$PARAMETER != "Package version",]
+
+            # checkboxInput: filter_blk_ghost_peaks, compute_pearson_correlation
+            booleans <- params[params$VALUE %in% c("TRUE", "FALSE"),]$PARAMETER
+            for (pb in booleans[booleans %in% names(input)]) {
+                try({
+                    shiny::updateCheckboxInput(session, pb, value = as.logical(params[params$PARAMETER == pb,]$VALUE))
+                    params[params$PARAMETER == pb,]$loaded <- TRUE
+                })
+            }
+
+            # filter_blk, filter_mz, filter_rsd, filter_rmd -> strings in checkboxGroupInput "filters"
+            try({
+                group_filters <- booleans[!(booleans %in% names(input))
+                                          & booleans %in% c("filter_blk", "filter_mz", "filter_rsd", "filter_rmd")]
+                shiny::updateCheckboxGroupInput(session, "filters", selected = group_filters)
+                for (pf in group_filters) params[params$PARAMETER == pf,]$loaded <- TRUE
+            })
+
+            # selectInput : pearson_p_value
+            if ("pearson_p_value" %in% params$PARAMETER) {
+                try({
+                    choices <- c(1, 0.05, 0.01)
+                    diff <- as.numeric(params[params$PARAMETER == "pearson_p_value",]$VALUE) - unlist(choices)
+                    closest <- choices[which.min(abs(diff))]
+                    shiny::updateSelectInput(session, "pearson_p_value", selected = closest)
+                    params[params$PARAMETER == "pearson_p_value",]$loaded <- TRUE
+                })
+            }
+
+            # filter_rmd_range -> 2 numericInput "filter_rmd_range_min" and "filter_rmd_range_max"
+            if ("filter_rmd_range" %in% params$PARAMETER) {
+                try({
+                    str_range <- as.character(params[params$PARAMETER == "filter_rmd_range",]$VALUE)
+                    str_range <- as.numeric(unlist(strsplit(substr(str_range, 2, nchar(str_range)-1), ",")))
+                    shiny::updateNumericInput(session, "filter_rmd_range_min", value = str_range[1])
+                    shiny::updateNumericInput(session, "filter_rmd_range_max", value = str_range[2])
+                    params[params$PARAMETER == "filter_rmd_range",]$loaded <- TRUE
+                })
+            }
+
+            # selection_criterion -> strings in checkboxGroupInput "selection_criteria" ("intensity", "degree")
+            if ("selection_criterion" %in% params$PARAMETER) {
+                if (params[params$PARAMETER == "selection_criterion",]$VALUE %in% c("both", "intensity", "degree")) {
+                    try({
+                        if (params[params$PARAMETER == "selection_criterion",]$VALUE == "both") {
+                            shiny::updateCheckboxGroupInput(session, "selection_criteria", selected = c("intensity", "degree"))
+                        } else {
+                            shiny::updateCheckboxGroupInput(session, "selection_criteria",
+                                selected = c(as.character(params[params$PARAMETER == "selection_criterion",]$VALUE)))
+                        }
+                        params[params$PARAMETER == "selection_criterion",]$loaded <- TRUE
+                    })
+                }
+            }
+
+            # textInput: compound_levels, biosoc_levels, levels_scores
+            for (pl in c("compound_levels", "biosoc_levels", "levels_scores")) {
+                try({
+                    if (pl %in% params$PARAMETER & params[params$PARAMETER == pl,]$VALUE != "[]") {
+                        str_list <- as.character(params[params$PARAMETER == pl,]$VALUE)
+                        str_list <- substr(str_list, 2, nchar(str_list)-1)
+                        shiny::updateTextInput(session, pl, value = str_list)
+                    }
+                    params[params$PARAMETER == pl,]$loaded <- TRUE
+                })
+            }
+
+            # numericInput
+            for (pn in c("filter_blk_threshold", "filter_rsd_threshold", "threshold_mz", "threshold_rt",
+                         "pearson_correlation_threshold", "n", "min_score")) {
+                try({
+                    shiny::updateNumericInput(session, pn, value = as.numeric(params[params$PARAMETER == pn,]$VALUE))
+                    params[params$PARAMETER == pn,]$loaded <- TRUE
+                })
+            }
+
+            # Feedback for user
+            params
+        })
 
 
         # References

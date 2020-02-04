@@ -49,10 +49,11 @@ check_architecture_for_launch_msfinder_annotation <- function(msfinder_biosoc_le
     check_path("links_ms_final")
     check_path("samples")
 
-    clean_for_current_run("final_folder", create_dir = TRUE)
+    clean_for_current_run("final_folder", delete = FALSE, create_dir = TRUE)
     clean_for_current_run("annotated_data-manual_check")
     clean_for_current_run("annotated_data-cleaned")
     clean_for_current_run("annotated_data-normalized")
+    for (source in c("pos", "neg")) clean_for_current_run(paste0("msp_", source))
 
     if (length(msfinder_biosoc_levels) == 0) print_warning("No levels provided for MSFinder annotation, only 'generic' will be used.")
 
@@ -96,6 +97,7 @@ check_for_convert_csv_to_msp <- function(min_score) {
     check_path("annotated_data-normalized")
     check_path("samples")
     check_positive_num(min_score)
+    for (source in c("pos", "neg")) clean_for_current_run(paste0("msp_", source))
 }
 
 
@@ -186,11 +188,12 @@ check_input_parameters_launch_msfinder <- function(msfinder_biosoc_levels, msfin
 #' Rename the old directory or file if existing.
 #'
 #' @eval recurrent_params("filetype")
+#' @param delete A boolean indicating whether the file or directory indicated by the path needs to be deleted.
 #' @param create_dir A boolean indicating whether the directory indicated by the path needs to be created.
 #' @param ... Additional parameters to pass to \code{\link{get_project_file_path}}.
-clean_for_current_run <- function(filetype, create_dir = FALSE, ...) {
+clean_for_current_run <- function(filetype, delete = TRUE, create_dir = FALSE, ...) {
     path <- get_project_file_path(filetype, ...)
-    if (file.exists(path)) {
+    if (file.exists(path) & delete) {
         if (!get("overwrite", envir = mscleanrCache) & !get("shiny_running", envir = mscleanrCache)) {
             assign("overwrite", get_confirmation_for_overwriting(path), envir = mscleanrCache)
         }
@@ -200,7 +203,7 @@ clean_for_current_run <- function(filetype, create_dir = FALSE, ...) {
         }
         else stop_script(path, " already exists.", generic_msg = FALSE)
     }
-    if (create_dir) dir.create(path)
+    if (create_dir) dir.create(path, showWarnings = FALSE)
 }
 
 

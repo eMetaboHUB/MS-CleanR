@@ -35,7 +35,6 @@ get_project_file_path <- function(filetype, source = NA, msfinder_info = NA, msf
     # intermediary_data
     wd <- file.path(get("analysis_directory", envir = mscleanrCache), "intermediary_data")
     if (filetype == "inter_folder")                return(wd)
-    if (filetype == "parameters")                  return(file.path(wd, "parameters.csv"))
     if (filetype == "samples")                     return(file.path(wd, "samples.csv"))
     if (filetype == "msdial_detected_adducts")     return(file.path(wd, "adducts-detected_by_MSDial.csv"))
     if (filetype == "adduct_links_graph")          return(file.path(wd, "adducts-initial.graphml"))
@@ -61,19 +60,25 @@ get_project_file_path <- function(filetype, source = NA, msfinder_info = NA, msf
 
     # CAD/PDA
     if (startsWith(filetype, "CAD_") | startsWith(filetype, "PDA_")) {
-        wd <- file.path(get("analysis_directory", envir = mscleanrCache), substr(filetype, 1, 3))
+        mode <- substr(filetype, 1, 3)
         subfiletype <- substring(filetype, 5)
-        if (subfiletype == "manual_data")           return(file.path(wd, "raw_data.csv"))
-        if (subfiletype == "cleaned")               return(file.path(wd, "reformatted_peaks.csv"))
-        if (subfiletype == "spectra_plot")          return(file.path(wd, "spectra_plot.pdf"))
-        if (subfiletype == "roi_plot")              return(file.path(wd, "ROI_plot.pdf"))
-        if (subfiletype == "filled")                return(file.path(wd, "grouped_filled_peaks.csv"))
-        if (subfiletype == "features")              return(file.path(wd, "featured_peaks.csv"))
+        wd <- file.path(get("analysis_directory", envir = mscleanrCache), mode)
+        if (subfiletype == "manual_data")          return(file.path(wd, "raw_data.csv"))
+        if (subfiletype == "cleaned")              return(file.path(wd, "reformatted_peaks.csv"))
+        if (subfiletype == "spectra_plot")         return(file.path(wd, "spectra_plot.pdf"))
+        if (subfiletype == "roi_plot")             return(file.path(wd, "ROI_plot.pdf"))
+        if (subfiletype == "filled")               return(file.path(wd, "grouped_filled_peaks.csv"))
+        if (subfiletype == "features")             return(file.path(wd, "featured_peaks.csv"))
     }
 
     # final data
     wd <- file.path(get("analysis_directory", envir = mscleanrCache), "final_data")
     if (filetype == "final_folder")                return(wd)
+    if (filetype == "params")                      return(file.path(wd, "parameters.csv"))
+    # if (filetype == "params_clean")                return(file.path(wd, "parameters_clean_msdial_data.csv"))
+    # if (filetype == "params_keep")                 return(file.path(wd, "parameters_keep_top_peaks.csv"))
+    # if (filetype == "params_launch")               return(file.path(wd, "parameters_launch_msfinder_annotation.csv"))
+    # if (filetype == "params_convert")              return(file.path(wd, "parameters_convert_csv_to_msp.csv"))
     if (filetype == "annotated_data-cleaned")      return(file.path(wd, "annotated_MS_peaks-cleaned.csv"))
     if (filetype == "annotated_data-normalized")   return(file.path(wd, "annotated_MS_peaks-normalized.csv"))
     if (filetype == "annotated_data-manual_check") return(file.path(wd, "annotated_MS_peaks-manual_check.csv"))
@@ -141,9 +146,47 @@ import_data <- function(filetype, ...) {
 #'
 #' @param ... Parameters used for the current run of the script.
 export_params <- function(...) {
-    params <- as.data.frame(list(...))
-    # Dealing with filter_rmd_range
-    params[1, "filter_rmd_range"] <- paste0("[", params[1, "filter_rmd_range"], ",", params[2, "filter_rmd_range"], "]")
-    params <- data.frame(PARAMETER = names(params), VALUE = as.character(params[1,]))
-    export_data(params, "parameters")
+    clean_list <- function(x) {
+        if (length(x) == 1) return(x)
+        if (length(x) == 0) return("")
+        if (is.null(names(x))) paste0("[", paste0(x, collapse = ","), "]")
+        else                   paste0("[",
+                                      paste0(lapply(names(x), FUN = function(y) { paste0(y, ":", x[[y]]) }), collapse = ","),
+                                      "]")
+    }
+
+    calling_func <- deparse(sys.calls()[[sys.nframe()-1]])
+    id_func <- unlist(strsplit(calling_func[1], "(", fixed = TRUE))[1]
+    params <- as.data.frame(lapply(list(...)[[1]], FUN = clean_list))
+    params[, ] <- lapply(params[, ], as.character) # converts all column to character, avoiding loss of logical values (sometimes converted to numeric otherwise)
+    params <- t(params)
+
+    current_params <- data.frame(FUNCTION  = id_func,
+                                 PARAMETER = c("Package version", rownames(params)),
+                                 VALUE     = c(as.character(utils::packageVersion("mscleanr")), params[,1]),
+                                 stringsAsFactors = FALSE)
+
+    # Better formatting for lists if only 1 element
+    for (p in c("compound_levels", "biosoc_levels", "levels_scores")) {
+        if (p %in% current_params$PARAMETER) {
+            val <- as.character(current_params[current_params$PARAMETER == p,]$VALUE)
+            if (!startsWith(val, "[")) {
+                current_params[current_params$PARAMETER == p,]$VALUE <- paste0("[", val, "]")
+            }
+        }
+    }
+
+    if (file.exists(get_project_file_path("params"))) {
+        existing_params <- import_data("params")
+        existing_params <- existing_params[existing_params$FUNCTION != id_func,]
+        current_params  <- rbind(existing_params, current_params)
+    }
+    current_params$FUNCTION <- factor(current_params$FUNCTION,
+                                      levels = c("Package version",
+                                                 "clean_msdial_data",
+                                                 "keep_top_peaks",
+                                                 "launch_msfinder_annotation",
+                                                 "convert_csv_to_msp",
+                                                 "launch_cad_fusion"))
+    export_data(current_params[order(current_params$FUNCTION),], "params")
 }
