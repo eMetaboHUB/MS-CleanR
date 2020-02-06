@@ -4,7 +4,7 @@ Title: Cleans MS Data for Easier Analyses
 Version: 0.70
 Authors@R: c(
     person("Ophélie", "Fraisier-Vannier", email = "ophelie.fraisier-vannier@univ-tlse3.fr", role = "aut"),
-    person("Guillaume", "Marty", email = "guillaume.marty@univ-tlse3.fr", role = "cre"),
+    person("Guillaume", "Marti", email = "guillaume.marti@univ-tlse3.fr", role = "cre"),
     person("Guillaume", "Cabanac", email = "guillaume.cabanac@univ-tlse3.fr", role = "aut"))
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
