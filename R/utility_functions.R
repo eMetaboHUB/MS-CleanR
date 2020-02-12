@@ -7,17 +7,17 @@
 increment_strings <- function(strings_to_increment, patterns) {
     new_names <- data.frame(old = strings_to_increment, new = NA, stringsAsFactors = FALSE)
     for(pattern in patterns) {
+        start_pattern <- paste0("^", pattern)
         if (nrow(new_names[new_names$old == pattern,]) > 0) new_names[new_names$old == pattern, "old"] <- paste0(pattern, ".0")
-        new_names[grepl(pattern, new_names$old), "new"] <- stringr::str_match(new_names[grepl(pattern, new_names$old), "old"],
-                                                                              ".+?(\\d+)$")[,2]
-        new_names[grepl(pattern, new_names$old), "new"] <- paste(pattern,
-                                                                 as.numeric(new_names[grepl(pattern, new_names$old), "new"]) + 1,
-                                                                 sep = ".")
+        new_names[grepl(start_pattern, new_names$old), "new"] <- stringr::str_match(new_names[grepl(start_pattern, new_names$old), "old"],
+                                                                                    ".+?(\\d+)$")[,2]
+        new_names[grepl(start_pattern, new_names$old), "new"] <- paste(pattern,
+                                                                       as.numeric(new_names[grepl(start_pattern, new_names$old), "new"]) + 1,
+                                                                       sep = ".")
     }
     new_names[is.na(new_names$new), "new"] <- new_names[is.na(new_names$new), "old"]
     return(new_names$new)
 }
-
 
 
 #' Extract data concatenated in a single column.
