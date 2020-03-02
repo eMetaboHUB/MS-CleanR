@@ -94,14 +94,19 @@ find_structure <- function(possibilities, score_only = FALSE, compound_levels = 
         # (1) Structures with a compound level
         for(cat in compound_levels) {
             for(lvl in biosoc_levels) {
-                tmp <- possibilities[possibilities$level == lvl & possibilities$Compound_level == cat,]
+                tmp <- possibilities[  !is.na(possibilities$level)
+                                     & !is.na(possibilities$Compound_level)
+                                     & possibilities$level == lvl
+                                     & possibilities$Compound_level == cat,]
                 if(nrow(tmp) > 0) return(get_most_probable(tmp))
             }
         }
 
         # (2) Structures without a compound level
         for(lvl in biosoc_levels) {
-            tmp <- possibilities[possibilities$level == lvl & !(possibilities$Compound_level %in% compound_levels),]
+            tmp <- possibilities[  !is.na(possibilities$level)
+                                 & possibilities$level == lvl
+                                 & !(possibilities$Compound_level %in% compound_levels),]
             if(nrow(tmp) > 0) return(get_most_probable(tmp))
         }
 
