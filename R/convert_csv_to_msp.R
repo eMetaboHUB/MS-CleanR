@@ -6,20 +6,33 @@
 #' @export
 convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
     check_for_convert_csv_to_msp(min_score)
+    export_params(as.list(environment()))
+
+    samples  <- import_data("samples")
 
     csv_data <- import_data("annotated_data-cleaned")
-    samples <- import_data("samples")
+    csv_data <- csv_data[c("annotation_result", "Structure", "Formula", "source", "Average.Rt.min.", "Average.Mz", "Adduct.type",
+                           "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")]
 
-    mandatory <- c("Structure", "Formula", "source", "Average.Rt.min.", "Average.Mz", "Adduct.type", "Final.score", "InChIKey", "SMILES", "MSMS.count", "MS.MS.spectrum")
-    # optional <- c("Ontology", "Classyfire_subclass", "level", "Compound_level", "Internal_id")
-    if (all) {
-        csv_data <- csv_data[mandatory]
-    } else {
-        csv_data <- csv_data[csv_data$annotation_result != "Unknown compound"
-                             & is.na(csv_data$annotation_warning)
-                             & csv_data$Final.score >= min_score,
-                             mandatory]
+    metadata <- import_data("annotated_data-normalized")
+    metadata_mandatory <- c("cluster", "selected_feature", "annotation_result", "annotation_warning", "source", "Average.Rt.min.",
+                            "Average.Mz", "Adduct.type", "Formula", "Structure", "Total.score", "Final.score", "Title", "PRECURSORMZ",
+                            "PRECURSORTYPE", "Theoretical.mass", "Mass.error", "Formula.score", "InChIKey", "SMILES")
+    metadata_optional <- names(metadata)[c(names(metadata) %in% c("level", "Compound_level", "Ontology",
+                                                                  "Higher_biosoc", "Family", "Biosoc",
+                                                                  "Classyfire_class", "Classyfire_subclass",
+                                                                  "Nb_external_dbs", "Links"))]
+    for (class in unique(samples[samples$Script_class != "Blank",]$Script_class)) {
+        metadata[paste0("avg_", class)] <- rowMeans(metadata[samples[samples$Class == "FD", "Column_name"]])
+        metadata_mandatory <- c(metadata_mandatory, paste0("avg_", class))
     }
+    metadata <- metadata[c(metadata_mandatory, metadata_optional)]
+
+    if (!all) {
+        csv_data <- csv_data[csv_data$annotation_result != "Unknown compound" & csv_data$Final.score >= min_score,]
+        metadata <- metadata[metadata$annotation_result != "Unknown compound" & metadata$Final.score >= min_score,]
+    }
+    csv_data$annotation_result <- NULL
     print_message(nrow(csv_data), " peaks to convert in MSP.")
 
     if (nrow(csv_data) > 0) {
@@ -46,6 +59,8 @@ convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
                 output_file <- file(get_project_file_path(paste0("msp_", source)))
                 writeLines(output, output_file)
                 close(output_file)
+
+                export_data(metadata[metadata$source == source,], paste0("msp_metadata_", source))
             }
         }
 

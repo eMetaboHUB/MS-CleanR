@@ -86,6 +86,8 @@ get_project_file_path <- function(filetype, source = NA, msfinder_info = NA, msf
     if (filetype == "final_PDA")                   return(file.path(wd, "PDA-cleaned.csv"))
     if (filetype == "msp_pos")                     return(file.path(wd, "peaks_pos.msp"))
     if (filetype == "msp_neg")                     return(file.path(wd, "peaks_neg.msp"))
+    if (filetype == "msp_metadata_pos")            return(file.path(wd, "peaks_metadata_pos.csv"))
+    if (filetype == "msp_metadata_neg")            return(file.path(wd, "peaks_metadata_neg.csv"))
 
     stop_script("Unrecognized filetype: ", filetype)
 }
