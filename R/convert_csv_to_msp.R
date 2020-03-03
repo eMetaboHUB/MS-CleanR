@@ -23,7 +23,7 @@ convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
                                                                   "Classyfire_class", "Classyfire_subclass",
                                                                   "Nb_external_dbs", "Links"))]
     for (class in unique(samples[samples$Script_class != "Blank",]$Script_class)) {
-        metadata[paste0("avg_", class)] <- rowMeans(metadata[samples[samples$Class == "FD", "Column_name"]])
+        metadata[paste0("avg_", class)] <- rowMeans(metadata[samples[samples$Script_class == class, "Column_name"]])
         metadata_mandatory <- c(metadata_mandatory, paste0("avg_", class))
     }
     metadata <- metadata[c(metadata_mandatory, metadata_optional)]
@@ -60,7 +60,7 @@ convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
                 writeLines(output, output_file)
                 close(output_file)
 
-                export_data(metadata[metadata$source == source,], paste0("msp_metadata_", source))
+                export_data(metadata[metadata$source == source,], paste0("msp_metadata_", source), empty_na = TRUE)
             }
         }
 
