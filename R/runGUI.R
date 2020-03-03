@@ -115,15 +115,14 @@ runGUI <- function() {
                 "Clean MS-DIAL data",
 
                 shiny::sidebarPanel(
-                    shiny::h6("Combine positive and negative files from MSDial and filter peaks according to user parameters."),
+                    shiny::h6("Filter peaks according to user parameters and optionnaly combine positive and negative feature lists if available."),
                     shiny::br(),
-                    shiny::h5("Filters"),
+                    shiny::h5("Generic filters"),
                     "Check which filters you want to use to clean your MS data.",
-                    shiny::h5("Deltas"),
-                    "Indicates the acceptable retention time and mass differences to consider that peaks are related.",
-                    shiny::h5("Clusterisation options"),
-                    "You can choose to use the Pearson correlation between peaks as a supplementary data used
-                    during clusterisation",
+                    shiny::h5("Clusterization deltas"),
+                    "Indicates the acceptable retention time and mass differences to consider for feature relationships clusterization.",
+                    shiny::h5("Clusterization options"),
+                    "You can choose to use the Pearson correlation between peaks to extend cluster size",
                     shiny::h5("(Optional) Reference files"),
                     "Optionally, you can use your own files for adducts and neutral losses.
                     See the documentation for more information."
@@ -284,13 +283,13 @@ runGUI <- function() {
                 "Keep top peaks by cluster",
 
                 shiny::sidebarPanel(
-                    shiny::h6("Keeps only the top peaks by cluster and by method."),
+                    shiny::h6("Keeps only the top peaks by cluster."),
                     shiny::br(),
                     shiny::h5("Selection mode"),
                     "Peaks selected can be the most intense (intensity), most connected (degree), or both.",
                     "If there are ties, the number of peaks selected can be greater than the number requested by the user.",
                     shiny::h5("Exporting filtered peaks"),
-                    "Copy MAT files corresponding to the selected peaks in a new folder for an faster analysis in MS-FINDER."
+                    "Copy MAT files corresponding to the selected peaks in a new folder for a faster analysis in MS-FINDER."
                 ),
 
                 shiny::mainPanel(
@@ -333,16 +332,16 @@ runGUI <- function() {
                 "Launch MS-FINDER annotation",
 
                 shiny::sidebarPanel(
-                    shiny::h6("Annotates peaks based on files extracted from MSFinder."),
+                    shiny::h6("Concatenate MS-FINDER annotations to the final filtered peak list."),
                     shiny::br(),
-                    shiny::h5("Compound levels"),
-                    "The list of compound levels to consider, in the given order (from more important to least important).",
-                    shiny::h5("Biosource levels"),
+                    shiny::h5("Compound levels prioritization"),
+                    "The list of compound levels to consider, in the given order (from more important to least important).A Compound_level column must be filled in your in-house database used for in silico based annotation",
+                    shiny::h5("Biosource levels prioritization"),
                     "The list of biosource levels to consider, in the given order (from more important to least important).",
-                    "They must correspond to the folders containing MS-FINDER files in your project directory.",
+                    "They must correspond to the folders containing MS-FINDER output annotation files in your project directory.",
                     "The level 'generic' is always added as the last biosource level considered.",
                     shiny::h5("Levels scores"),
-                    "A list of levels names and their corresponding multiplier to adapt final annotation scores."
+                    "A list of levels names and their corresponding multiplier to tune final annotation scores."
                 ),
 
                 shiny::mainPanel(
@@ -352,7 +351,7 @@ runGUI <- function() {
                                          value = FALSE,
                                          width = "90%"),
                     shiny::checkboxInput("score_only",
-                                         "Select the best annotation for each peak based only on MSFINDER scores?",
+                                         "Select the best annotation for each peak based only on MS-FINDER scores?",
                                          value = FALSE,
                                          width = "90%"),
                     shiny::br(),
