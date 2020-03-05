@@ -6,7 +6,7 @@
 #' @export
 convert_csv_to_msp <- function(all = FALSE, min_score = 20) {
     check_for_convert_csv_to_msp(min_score)
-    export_params(as.list(environment()))
+    # export_params(as.list(environment()))
 
     samples  <- import_data("samples")
 
