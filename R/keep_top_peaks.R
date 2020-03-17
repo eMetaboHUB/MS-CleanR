@@ -15,6 +15,7 @@ keep_top_peaks <- function(selection_criterion,
 
     check_input_parameters_keep_top_peaks(selection_criterion, n, export_filtered_peaks)
     check_architecture_for_keep_top_peaks(export_filtered_peaks)
+    export_params(as.list(environment()))
 
     print_message("Filtering on ", selection_criterion, " (", n, " peaks by cluster and by method)")
 
