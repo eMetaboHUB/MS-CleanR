@@ -82,19 +82,11 @@ clean_msdial_data <- function(filter_blk = TRUE,
 
     print_message("*** Treating ", get("analysis_directory", envir = mscleanrCache), " ***")
 
-    export_params(filter_blk                  = filter_blk,
-                  filter_blk_threshold        = filter_blk_threshold,
-                  filter_mz                   = filter_mz,
-                  filter_rsd                  = filter_rsd,
-                  filter_rsd_threshold        = filter_rsd_threshold,
-                  filter_blk_ghost_peaks      = filter_blk_ghost_peaks,
-                  filter_rmd                  = filter_rmd,
-                  filter_rmd_range            = filter_rmd_range,
-                  threshold_mz                = threshold_mz,
-                  threshold_rt                = threshold_rt,
-                  compute_pearson_correlation = compute_pearson_correlation,
-                  pearson_threshold           = pearson_correlation_threshold,
-                  pearson_p_value             = pearson_p_value)
+    params <- as.list(environment())
+    for (ref in c("user_pos_adducts_refs", "user_neg_adducts_refs", "user_pos_neutral_refs", "user_neg_neutral_refs")) {
+        params[[ref]] <- ifelse(is.na(params[[ref]]), "package", "personalized")
+    }
+    export_params(params)
 
     # MSDIAL
     msdial <- import_msdial_data(filter_blk,
