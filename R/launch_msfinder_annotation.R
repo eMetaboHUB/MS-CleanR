@@ -52,6 +52,7 @@ launch_msfinder_annotation <- function(compound_levels     = NULL,  # c() = NULL
 
     check_input_parameters_launch_msfinder(biosoc_levels, compound_levels, levels_scores)
     check_architecture_for_launch_msfinder_annotation(biosoc_levels)
+    export_params(as.list(environment()))
 
     print_message("*** Treating ", get("analysis_directory", envir = mscleanrCache), " ***")
     if (score_only) {
