@@ -144,51 +144,52 @@ import_data <- function(filetype, ...) {
 
 
 
-#' Export parameters used for the current run.
-#'
-#' @param ... Parameters used for the current run of the script.
-export_params <- function(...) {
-    clean_list <- function(x) {
-        if (length(x) == 1) return(x)
-        if (length(x) == 0) return("")
-        if (is.null(names(x))) paste0("[", paste0(x, collapse = ","), "]")
-        else                   paste0("[",
-                                      paste0(lapply(names(x), FUN = function(y) { paste0(y, ":", x[[y]]) }), collapse = ","),
-                                      "]")
-    }
-
-    calling_func <- deparse(sys.calls()[[sys.nframe()-1]])
-    id_func <- unlist(strsplit(calling_func[1], "(", fixed = TRUE))[1]
-    params <- as.data.frame(lapply(list(...)[[1]], FUN = clean_list))
-    params[, ] <- lapply(params[, ], as.character) # converts all column to character, avoiding loss of logical values (sometimes converted to numeric otherwise)
-    params <- t(params)
-
-    current_params <- data.frame(FUNCTION  = id_func,
-                                 PARAMETER = c("Package version", rownames(params)),
-                                 VALUE     = c(as.character(utils::packageVersion("mscleanr")), params[,1]),
-                                 stringsAsFactors = FALSE)
-
-    # Better formatting for lists if only 1 element
-    for (p in c("compound_levels", "biosoc_levels", "levels_scores")) {
-        if (p %in% current_params$PARAMETER) {
-            val <- as.character(current_params[current_params$PARAMETER == p,]$VALUE)
-            if (!startsWith(val, "[")) {
-                current_params[current_params$PARAMETER == p,]$VALUE <- paste0("[", val, "]")
-            }
-        }
-    }
-
-    if (file.exists(get_project_file_path("params"))) {
-        existing_params <- import_data("params")
-        existing_params <- existing_params[existing_params$FUNCTION != id_func,]
-        current_params  <- rbind(existing_params, current_params)
-    }
-    current_params$FUNCTION <- factor(current_params$FUNCTION,
-                                      levels = c("Package version",
-                                                 "clean_msdial_data",
-                                                 "keep_top_peaks",
-                                                 "launch_msfinder_annotation",
-                                                 "convert_csv_to_msp",
-                                                 "launch_cad_fusion"))
-    export_data(current_params[order(current_params$FUNCTION),], "params")
-}
+# FIXME
+# Export parameters used for the current run.
+#
+# @param ... Parameters used for the current run of the script.
+# export_params <- function(...) {
+#     clean_list <- function(x) {
+#         if (length(x) == 1) return(x)
+#         if (length(x) == 0) return("")
+#         if (is.null(names(x))) paste0("[", paste0(x, collapse = ","), "]")
+#         else                   paste0("[",
+#                                       paste0(lapply(names(x), FUN = function(y) { paste0(y, ":", x[[y]]) }), collapse = ","),
+#                                       "]")
+#     }
+#
+#     calling_func <- deparse(sys.calls()[[sys.nframe()-1]])
+#     id_func <- unlist(strsplit(calling_func[1], "(", fixed = TRUE))[1]
+#     params <- as.data.frame(lapply(list(...)[[1]], FUN = clean_list))
+#     params[, ] <- lapply(params[, ], as.character) # converts all column to character, avoiding loss of logical values (sometimes converted to numeric otherwise)
+#     params <- t(params)
+#
+#     current_params <- data.frame(FUNCTION  = id_func,
+#                                  PARAMETER = c("Package version", rownames(params)),
+#                                  VALUE     = c(as.character(utils::packageVersion("mscleanr")), params[,1]),
+#                                  stringsAsFactors = FALSE)
+#
+#     # Better formatting for lists if only 1 element
+#     for (p in c("compound_levels", "biosoc_levels", "levels_scores")) {
+#         if (p %in% current_params$PARAMETER) {
+#             val <- as.character(current_params[current_params$PARAMETER == p,]$VALUE)
+#             if (!startsWith(val, "[")) {
+#                 current_params[current_params$PARAMETER == p,]$VALUE <- paste0("[", val, "]")
+#             }
+#         }
+#     }
+#
+#     if (file.exists(get_project_file_path("params"))) {
+#         existing_params <- import_data("params")
+#         existing_params <- existing_params[existing_params$FUNCTION != id_func,]
+#         current_params  <- rbind(existing_params, current_params)
+#     }
+#     current_params$FUNCTION <- factor(current_params$FUNCTION,
+#                                       levels = c("Package version",
+#                                                  "clean_msdial_data",
+#                                                  "keep_top_peaks",
+#                                                  "launch_msfinder_annotation",
+#                                                  "convert_csv_to_msp",
+#                                                  "launch_cad_fusion"))
+#     export_data(current_params[order(current_params$FUNCTION),], "params")
+# }

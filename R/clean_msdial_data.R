@@ -86,7 +86,7 @@ clean_msdial_data <- function(filter_blk = TRUE,
     for (ref in c("user_pos_adducts_refs", "user_neg_adducts_refs", "user_pos_neutral_refs", "user_neg_neutral_refs")) {
         params[[ref]] <- ifelse(is.na(params[[ref]]), "package", "personalized")
     }
-    export_params(params)
+#    export_params(params)
 
     # MSDIAL
     msdial <- import_msdial_data(filter_blk,

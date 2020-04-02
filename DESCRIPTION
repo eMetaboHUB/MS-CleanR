@@ -1,7 +1,7 @@
 Package: mscleanr
 Type: Package
 Title: Cleans MS Data for Easier Analyses
-Version: 0.77
+Version: 1.0
 Authors@R: c(
     person("Ophélie", "Fraisier-Vannier", email = "ophelie.fraisier-vannier@univ-tlse3.fr", role = "aut"),
     person("Guillaume", "Marti", email = "guillaume.marti@univ-tlse3.fr", role = "cre"),
