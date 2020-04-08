@@ -11,7 +11,7 @@ Publication link
 
 ### Credits
 - [Université Toulouse III -- Paul Sabatier](https://www.univ-tlse3.fr)
-- [MetaToul Platform](https://www.lrsv.ups-tlse.fr/metatoul-en/)
+- [MetaToul-AgromiX Platform](https://www.lrsv.ups-tlse.fr/metatoul-en/)
 
 ### Licence
 GPL-3
