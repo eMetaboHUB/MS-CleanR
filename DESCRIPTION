@@ -1,4 +1,4 @@
-Package: MSCleanR
+Package: mscleanr
 Type: Package
 Title: Cleans MS Data for Easier Analyses
 Version: 1.0
