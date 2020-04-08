@@ -4,8 +4,7 @@ The mscleanr package provides functions for feature filtering and annotation of 
 
 See the documentation and tutorial for more information.
 
-Needs MS-DIAL v4.00 or higher.
-Needs MS-FINDER 3.30 or higher
+Needs MS-DIAL (v4.00 or higher) and MS-FINDER (3.30 or higher): http://prime.psc.riken.jp/compms/index.html
 
 ### TODO
 Publication link
