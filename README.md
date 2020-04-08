@@ -1,10 +1,11 @@
-# mscleanr: A package for cleaning and analyzing MS data
+# mscleanr: A package for cleaning and annotating LC-MS data
 
-The mscleanr package provides functions to clean and analyse MS data.
+The mscleanr package provides functions for feature filtering and annotation of LC-MS data.
 
 See the documentation and tutorial for more information.
 
-Needs MSDial v4.00 or higher.
+Needs MS-DIAL v4.00 or higher.
+Needs MS-FINDER 3.30 or higher
 
 ### TODO
 Publication link
