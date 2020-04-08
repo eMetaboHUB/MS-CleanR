@@ -1,6 +1,6 @@
-# mscleanr: A package for cleaning and annotating LC-MS data
+# MS-CleanR: A package for cleaning and annotating LC-MS data
 
-The mscleanr package provides functions for feature filtering and annotation of LC-MS data.
+The MS-CleanR package provides functions for feature filtering and annotation of LC-MS data.
 
 See the documentation and tutorial for more information.
 

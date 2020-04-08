@@ -6,10 +6,10 @@ Authors@R: c(
     person("Ophélie", "Fraisier-Vannier", email = "ophelie.fraisier-vannier@univ-tlse3.fr", role = "aut"),
     person("Guillaume", "Marti", email = "guillaume.marti@univ-tlse3.fr", role = "cre"),
     person("Guillaume", "Cabanac", email = "guillaume.cabanac@univ-tlse3.fr", role = "aut"))
-Description: Cleans MS Data for Easier Analyses:
-    Combine pos and neg files from MSDial and filter peaks according to user parameters.
+Description: Cleans MS Data for easier and faster analyses:
+    Combine pos and neg files from MS-DIAL and filter peaks according to user parameters.
     Filter cleaned peaks based on various criteria.
-    Annotates peaks based on files extracted from MSFinder.
+    Annotates peaks based on files extracted from MS-FINDER.
     Convert CSV peaks data to MSP format.
 License: GPL-3
 Encoding: UTF-8
