@@ -7,7 +7,7 @@ See the publication and tutorial for more information.
 Needs MS-DIAL (v4.00 or higher) and MS-FINDER (3.30 or higher): http://prime.psc.riken.jp/compms/index.html
 
 ### Citation
-Publication link: https://www.biorxiv.org/content/10.1101/2020.04.09.033308v1
+Publication link: https://www.biorxiv.org/content/10.1101/2020.04.09.033308v2
 
 ### Credits
 - [Université Toulouse III -- Paul Sabatier](https://www.univ-tlse3.fr)
