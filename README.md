@@ -2,7 +2,7 @@
 
 The MS-CleanR package provides functions for feature filtering and annotation of LC-MS data.
 
-See the publication and tutorials (pdf of this page) for more information.
+See the publication and tutorials (pdf files included in the master branch) for more information.
 
 Needs MS-DIAL (v4.00 or higher) and MS-FINDER (3.30 or higher): http://prime.psc.riken.jp/compms/index.html
 
