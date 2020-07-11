@@ -17,7 +17,12 @@ library(mscleanr)
 runGUI() 
 ```
 ### Citation
-Publication link: https://www.biorxiv.org/content/10.1101/2020.04.09.033308v2
+Publication link: https://pubs.acs.org/doi/abs/10.1021/acs.analchem.0c01594
+MS-CleanR: A Feature-Filtering Workflow for Untargeted LC–MS Based Metabolomics
+Ophélie Fraisier-Vannier, Justine Chervin, Guillaume Cabanac, Virginie Puech, Sylvie Fournier, Virginie Durand, Aurélien Amiel, Olivier André, Omar Abdelaziz Benamar, Bernard Dumas, Hiroshi Tsugawa, and Guillaume Marti
+Analytical Chemistry Article ASAP
+DOI: 10.1021/acs.analchem.0c01594
+
 
 ### Credits
 - [Université Toulouse III -- Paul Sabatier](https://www.univ-tlse3.fr)
