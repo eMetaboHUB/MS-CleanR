@@ -17,8 +17,9 @@ library(mscleanr)
 runGUI() 
 ```
 ### Known Bugs
+First, read carefully the MS-DIAL/CleanR/FINDER tutorial
+
 Thanks to all users for their feedback!!
-- Recent update of "vroom" package led to the crash of the R session during MS-CleanR process. Please downgrade it to version 1.2.1
 - At least 3 blanks and 3 QCs samples are needed for Blank ratio analysis. These samples must be identified as such in the MS-Dial sample list.
 - Avoid spaces in samples or classes names and replace it by "-"; "." or "_"
 - Avoid class names with only one letter
