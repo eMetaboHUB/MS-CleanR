@@ -24,6 +24,7 @@ Thanks to all users for their feedback!!
 - Avoid spaces and "-" in samples or classes names
 - Avoid class names with only one letter
 - MSCleanR handle LCMS acquired in DIA or DDA mode. All features without MS/MS will be discarded during the first step. If data contain MS1 only, the first MS-CleanR step will crash.
+- "Error: the condition has length > 1" is encountered during database annotations merging if using R > 4.2
 
 ### Citation
 Publication link: https://pubs.acs.org/doi/abs/10.1021/acs.analchem.0c01594
