@@ -26,6 +26,9 @@ Thanks to all users for their feedback!!
 - MSCleanR handle LCMS acquired in DIA or DDA mode. All features without MS/MS will be discarded during the first step. If data contain MS1 only, the first MS-CleanR step will crash.
 - "Error: the condition has length > 1" is encountered during database annotations merging if using R > 4.2
 
+### Last News
+Since the active development of MSDial 5.x and the integration of a part of MScleanR, this tool will no longer be maintained. We are cooking a new version which take into account all MSDial 5 new features. Hope it will be published soon.
+
 ### Citation
 Publication link: https://pubs.acs.org/doi/abs/10.1021/acs.analchem.0c01594
 MS-CleanR: A Feature-Filtering Workflow for Untargeted LC–MS Based Metabolomics
